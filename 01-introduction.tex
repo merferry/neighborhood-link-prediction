@@ -1,4 +1,10 @@
-TODO.
+Link prediction is the problem of forecasting connections between network nodes, even in cases of missing or undiscovered information. This is useful in various applications, such as recommending items for online purchase and predicting co-authorships in academic research networks. There are several different approaches are used to predict the link. In Neighbor-based approaches, a similarity score is computed between non-neighbor nodes. A high similarity score between the pair of nodes, indicates a higher likelihood of existence of a link between the two nodes \cite{gatadi2023lpcd, wang2014link}.
+
+On the other hand, community detection involves identifying clusters of vertices characterized by strong internal connections and weak connections to the rest of the graph. These communities are intrinsic when identified based on network structure, without external attributes. Furthermore, they are disjoint, when each vertex belongs to just one community. Applications of community detection span various domains, including drug discovery, protein annotation, disease prediction, topic identification, and criminal profiling \cite{com-gregory10}.
+
+To address inaccuracies in community detection caused by missing or undiscovered links in networks, Eric et al. \cite{de2021enriching} employ the LINE approach for link prediction prior to community formation. Gatadi et al. \cite{gatadi2023lpcd} build upon this by integrating dynamic $\Delta$-screening \cite{com-zarayeneh21} and the Leiden algorithm\ignore{\cite{com-traag19}} to update communities dynamically after link prediction instead of using static community detection. However, their approach involves computing expensive similarity scores (Jaccard's coefficient and Hub-Promoted score) between all pairs of nodes, which is impractical for large graphs \cite{gatadi2023lpcd}.
+
+In this poster, we parallelize link prediction and present algorithmic techniques to significantly accelerate it. In addition, we use the parallel Dynamic Frontier Hybrid Louvain-LPA algorithm for community detection to further accelerate the dynamic community detection algorithm.
 
 
 

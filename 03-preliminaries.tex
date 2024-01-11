@@ -24,16 +24,71 @@ TODO.
 
 
 
+\subsection{Jaccard Coefficient (JC)}
 
-\subsection{Louvain algorithm}
-\label{sec:about-louvain}
+The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a similarity measure commonly used in network analysis and link prediction. It provides a normalized assessment of the similarity between two nodes in a graph, in terms of their neighborhoods. JC is defined such that it assigns higher values to pairs of nodes that share a greater proportion of common neighbors relative to their total number of neighbors, as given in Equation \ref{eq:jc}.
 
-TODO.
+\begin{equation}
+\label{eq:jc}
+  JC(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i \cup \Gamma_j|}
+\end{equation}
 
 
 
 
-\subsection{Leiden algorithm}
-\label{sec:about-leiden}
+\subsection{S{\o}rensen Index (SI)}
 
-TODO.
+The S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as the S{\o}rensen–Dice coefficient, is another similarity metric commonly applied in network analysis and link prediction. This metric, defined by Equation \ref{eq:si}, extends beyond solely accounting for the size of common neighbors and introduces the idea that nodes with lower degrees are more likely to form links.
+
+\begin{equation}
+\label{eq:si}
+  SI(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i| + |\Gamma_j|}
+\end{equation}
+
+
+
+
+\subsection{Salton Cosine similarity (SC)}
+
+The Salton Cosine similarity (SC) \cite{salton1973specification} is a frequently used cosine metric in the context of measuring similarity between two nodes in a graph. It essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $i$ and $j$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
+
+\begin{equation}
+\label{eq:sc}
+  SC(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{\sqrt{|\Gamma_i| \cdot |\Gamma_j|}}
+\end{equation}
+
+
+
+
+\subsection{Hub Promoted (HP)}
+
+The Hub Promoted (HP) score \cite{liben2003link} is a metric that assesses the topological overlap between two nodes, denoted as $i$ and $j$, in a graph. It is defined by the formula given in Equation \ref{eq:hp}. The HP score is particularly influenced by the lower degree of nodes, and can be valuable in scenarios where the involvement of lower-degree nodes is considered important in understanding network connectivity.
+
+\begin{equation}
+\label{eq:hp}
+  HP(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{min(|\Gamma_i|, |\Gamma_j|)}
+\end{equation}
+
+
+
+
+\subsection{Hub Depressed (HD)}
+
+In contrast to the HP score, the Hub Depressed (HD) score \cite{zhou2009predicting} is determined by the higher degrees of nodes. It can be particularly useful in cases where the influence of highly connected nodes on network structure is of interest. The HD score between two nodes $i$ and $j$ in the graph is defined as per Equation \ref{eq:hd}.
+
+\begin{equation}
+\label{eq:hd}
+  HD(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{max(|\Gamma_i|, |\Gamma_j|)}
+\end{equation}
+
+
+
+
+\subsection{Leicht-Holme-Nerman (LHN)}
+
+The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metric that assigns high similarity to node pairs that exhibit a greater number of common neighbors than would be expected by random chance. One may use Equation \ref{eq:lhn} to compute the LHN score between two nodes $i$ and $j$ in a graph.
+
+\begin{equation}
+\label{eq:lhn}
+  LHN(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i| \cdot |\Gamma_j|}
+\end{equation}

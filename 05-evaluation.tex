@@ -10,10 +10,16 @@ We employ a server equipped with two Intel Xeon Gold 6226R processors, each feat
 
 We use 32-bit integers for vertex ids and 32-bit float for edge weights but use 64-bit floats for computations and hashtable values. We utilize $64$ threads to match the number of cores available on the system (unless specified otherwise). For compilation, we use GCC 8.5 and OpenMP 4.5.
 
+%% From LP SRS
+We use 32-bit integers for vertex ids and 32-bit float for edge weights but use 64-bit floats for computations and hashtable values. We utilize $64$ threads to match the number of cores available on the system.
+
 
 \subsubsection{Dataset}
 
 The graphs used in our experiments are given in Table \ref{tab:dataset}. These are sourced from the SuiteSparse Matrix Collection \cite{suite19}. In the graphs, number of vertices vary from $3.07$ to $214$ million, and number of edges vary from $25.4$ million to $3.80$ billion. We ensure edges to be undirected and weighted with a default of $1$.
+
+%% From LP SRS
+For the experiments, we use $13$ graphs from the SuiteSparse Matrix Collection\ignore{\cite{suite19}}. In the graphs, number of vertices vary from $3.07$ to $214$ million, and number of edges vary from $25.4$ million to $3.80$ billion. We ensure edges to be undirected and weighted with a default of $1$. For each graph, we generate uniformly random batch of edge deletions of size $10^{-7} |E|$ to $0.1 |E|$. For each batch size, we generate five random batch updates for averaging.
 
 \input{src/tab-dataset}
 % \input{src/fig-leiden-compare}
@@ -24,10 +30,13 @@ The graphs used in our experiments are given in Table \ref{tab:dataset}. These a
 
 \subsection{Comparing Performance of GVE-Leiden}
 
+Upon each graph with edge deletions of batch size $B$ applied, we then predict the same number of edges $B$ using both JC and HP similarity scores. As mentioned in Section \ref{sec:approach}, we avoid high-degree first-order neighbors. For this, we adjust the degree threshold $D$ from $4$ to $32$ in multiples of $2$.
+
+Figure X shows the average runtime of link prediction with degree threshold $D$ of $4$, $8$, $16$, and $32$. Increasing $D$ increases runtime by a small amount, due to increase second-degree neighbor exploration. Increasing/decreasing the batch size however does not have an effect on runtime, as the algorithm must continue to explore possible links with higher scores even if batch/prediction size $B$ edges have been added to the prediction list. Note that runtime for link prediction with JC/HP similarity scores is nearly identical. On a batch size of $0.1 |E|$, we compare the predicted links with the links in the original graphs (without edge deletions). We observe that HP-based link prediction with $D = 16$ obtains the highest average accuracy of $2.4\%$, while HP-based link prediction with $D = 4$ obtains the highest average precision of $6.4\%$. Given the vast set of potential predictions (${}_N C_2 - |E|$), achieving high accuracy and precision remains a challenge.
+
 TODO.
 
-% \input{src/fig-leiden-splits}
-% \input{src/fig-leiden-hardness}
+\input{src/fig-input-large}
 \input{src/fig-strong-scaling}
 
 
@@ -40,6 +49,8 @@ TODO.
 
 
 
-\subsection{Strong Scaling of GVE-Leiden}
+\subsection{Strong Scaling of our Optimized Neighbor-based Link Prediction Methods}
 
-TODO.
+Finally, we assess the strong scaling performance of our optimized neighbor-based link prediction methods. In this analysis, we vary the number of thread from $1$ to $32$ in multiples of $2$ for each input graph, and measure the average time taken to predict $10^{-2}|E|$ links by Hub Promoted (HP), Leicht-Holme-Nerman (LHN), Adamic-Adar Coefficient (AA), and Resource Allocation (RA) based link prediction methods with the \textit{MAX\_MEDIATOR\_DEGREE} parameter set to $4$. The results are shown in Figure \ref{fig:strong-scaling}. It not only illustrates the overall scaling performance, but the also scaling of the two phases of each link prediction method, i.e., identifying edges with top-k scores in each thread (scoring phase), and combining the scores obtained by each thread to obtain the global top-k edges (merging phase). With $32$ threads, our optimized link prediction methods achieve an overall speedup of $7.2\times$ (with respect to sequential execution), indicating a performance increase of $1.5\times$ for every doubling of threads. The scalability is limited, as the cost of the merging phase increases with an increase in the number of threads. In fact, at $32$ threads, the merging phase obtains a speedup of $0.7\times$ (yes it is less than $1$\ignore{, as its runtime increases}), while the scoring phase achieves a speedup of $18.5\times$.
+
+\input{src/fig-input-small}
