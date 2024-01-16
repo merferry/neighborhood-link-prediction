@@ -1,9 +1,17 @@
-\begin{figure}[hbtp]
+\begin{figure*}[hbtp]
   \centering
-  \subfigure{
-    \label{fig:about-pruning--all}
-    \includegraphics[width=0.38\linewidth]{out/about-pruning.pdf}
+  \subfigure[Standard approach]{
+    \label{fig:about-pruning--01}
+    \includegraphics[width=0.31\linewidth]{out/about-pruning-01.pdf}
+  }
+  \subfigure[Disregard hubs with degree $> 8$]{
+    \label{fig:about-pruning--02}
+    \includegraphics[width=0.31\linewidth]{out/about-pruning-02.pdf}
+  }
+  \subfigure[Disregard hubs with degree $> 4$]{
+    \label{fig:about-pruning--03}
+    \includegraphics[width=0.31\linewidth]{out/about-pruning-03.pdf}
   } \\[-2ex]
-  \caption{Low degree vertices, such as $2$, confer significant similarity among its neighbors, while high-degree vertices, such as $3$, do not. Here $4$ is a second-order neighbor of $1$.}
+  \caption{Illustration of our neighborhood-based link prediction approach, which disregards large hubs (first-order neighbors with high degree). The approach applies to each vertex in the graph. Here, we focus on the neighborhood of a vertex $1$ in the graph. The current vertex $1$ is outlined in black, its first-order neighbors in red, and its second-order neighbors in blue. Edge directions indicate traversal, with some second order vertices omitted for simplicity (dotted edges). (a) Depicts the standard approach, which considers all second-order neighbors of vertex $1$. (b) Presents our approach, which considers only second-order neighbors linked to $1$ through a small hub (degree $\leq 8$). This pruning reduces runtime and enhances prediction quality. (c) Illustrates our approach, where vertices with degree $> 4$ are considered large hubs.}
   \label{fig:about-pruning}
-\end{figure}
+\end{figure*}

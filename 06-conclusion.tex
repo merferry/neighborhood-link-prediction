@@ -1,62 +1,19 @@
+Almost all obtained social network data is incomplete since only part of social information can be collected from social network platforms \cite{wang2014link}. Second, social networks are highly dynamic, which might lead the nodes and edges to appear or disappear in the future \cite{wang2014link}.
+Link prediction aims to anticipate the probability of a future connection between two nodes in a given network based on their previous interactions and the network structure \cite{arrar2023comprehensive}.
+
+
 In an early survey \cite{lu2011link}, we noticed the low stability of individual link predictors and thus suggested ensemble learning as a powerful tool to integrate them. Ensemble learning is a popular method in machine learning, which constructs and integrates a number of individual predictors to achieve better algorithmic performance \cite{zhou2012ensemble}.
 
 While we explore 2nd order neighbors in this report, our techniques can be extended to apply to 3rd or 4th order neighbors.
 
+\ignore{Can the algorithms scale to 3rd order neighbors? (is it relevant?)}
+
 In the future, we want to explore optimizing quasi-local and global methods of similarity. What are tensor factorization algorithms? Note that local-neighborhood similarity based link prediction techniques can only predict links between vertices that are at a distance of 2 (only). For farther nodes, multiple application of local neighborhood scores may be done (or recursive scoring).
 
+\ignore{What is the link prediction problem? Why is it similar to a compression/GAN problem? Understand the given network, and predict the missing links. Why it can never be 100\% precise, but precise enough?}
 
-Points:
+\ignore{Why the input is only 1 graph? Importance of learning from other similar graphs in the dataset (or from the subsets of the graph). Explainability --- why this is important --- thus the simple algorithms (they help with explainability).}
 
-- Can the algorithms scale to 3rd order neighbors? (is it relevant?)
+In recent years, the field of link prediction has witnessed a significant increase in research activities. Over the years, numerous methods have been developed for link prediction, encompassing similarity-based indices, dimensionality reduction based methods, machine learning techniques, and more \cite{arrar2023comprehensive}.
 
-- What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?
-
-- Explain the confusion y-axis on precision.
-
-- Explain the algorithm, including the baseline. Tell which parameter setting of max mediator degree is suitable.
-
-- Explain the detailed detailed approach diagram. How do you explore reachable nodes at distance 2. How do you compute intersection (or score for AA, RA)? How do you skip high-degree mediators (or 1st order neighbors)? Why is this efficient?
-
-- How do you maintain per-thread prediction list? Is it efficient? How do you merge the prediction lists? Is it efficient?
-
-- What is the link prediction problem? Why is it similar to a compression/GAN problem? Understand the given network, and predict the missing links. Why it can never be 100\% precise, but precise enough?
-
-- Why the input is only 1 graph? Importance of learning from other similar graphs in the dataset (or from the subsets of the graph). Explainability --- why this is important --- thus the simple algorithms (they help with explainability).
-
-- Sizes of graphs are large so running other approaches is expensive.
-
-- Why precision on road networks and protein k-mer graphs low? (low average degrees)
-
-- What is the processing / prediction rate? (by predicted edges, and by number of edges in the graph)
-
-- Can you show details plots? No.
-
-- Why is string scaling of our link prediction approach low? Why is it especially for the merging phase?
-
-- How do you explore the neighbors of each node, and compute intersection? What is a super naive way to do the above?
-
-- Are there no missing links in the original graphs?
-
-- What is the expected precision of random guess?
-
-- Why not showcase 0.01 E and 0.1 E, and remove the other plots?
-
-- Why the choice of best method appears to change with batch size?
-
-- Arent graphs heterogeneous? Why one method works?
-
-- Why do these methods perform well?
-
-- Why is precision low?
-
-- What we observe on our dataset? What we observe on smaller graphs?
-
-- On a set of smaller graphs, we observe/identify the most precise approaches, and observe the X, X, and X to perform the best. Accordingly, we run these methods on the graphs in our dataset.
-
-- Selecting best approach based on precision and runtime, for batch size $10^{-4}|E|$ to $0.1|E|$, and present the result. The runtime and precision of each method (appendix).
-
-- Comparison with baseline approach ($\infty$), i.e., exploring all possible/reachable pairs at distance 2, and quickly computing intersection, scores, adding to heap, and merging across threads. Explain with figure in approach.
-
-- All approaches require computing intersection, even AA and RA.
-
-- Runtime + speedup + precision for $0.1|E|$.
+\ignore{What is the link prediction problem? Why is it similar to a compression/GAN problem? Understand the given network, and predict the missing links. Why it can never be 100\% precise, but precise enough?}

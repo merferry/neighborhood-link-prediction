@@ -1,81 +1,34 @@
-Consider a social network $G(V,E)$ at a particular time $t$, where $V$ and $E$ are sets of nodes and links, respectively \cite{wang2014link}. The link prediction aims to predict new links or deleted links between nodes for a future time $t$ ($t > t$), or missing links or unobserved links, in the current network \cite{wang2014link}. This problem can be explained by a simple social network about five persons in Figure 6, in which solid links indicate interactions already existing at time $t$, and dashed links indicate links that have newly appeared during the interval time $[t, t]$. At time $t$, Alice and Bob are friends, Alice and Nick are also friends. At time $t$, maybe Alice has introduced Bob to Nick, they become friends too. Analogously, Nick and Amy would become friends at time $t$. The goal of the link prediction problem here is to predict the appearance of newly added friendship between persons \cite{wang2014link}.
+Consider a undirected graph $G(V, E)$, where $V$ and $E$ are the sets of vertices and edges respectively. For the sake of simplicity, we ignore directedness or weights of edges, and disallow self-loops or multiple edges between vertices. Let $U$ be the universal set containing all $|V|(|V|-1)/2$ possible edges in the graph. Thus, $U - E$ is the set of unobserved edges. Assuming that there are some missing or future edges in the set of unobserved edges $U - E$, the task of link prediction is to\ignore{probabilistically} find out those missing or future links \cite{zhou2021progresses}. Note that the ratio of positive to negative edges is huge. Garcia et. al \cite{garcia2014link} observe that this ratio goes from $1 : 11k$ in their best case to $1 : 27M$ in the worst case. This huge imbalance makes link prediction a needle in a haystack problem, where we are trying to find a tiny set of correct edges within a huge set of incorrect ones \cite{garcia2014link, wang2014link}. Further, the size of graphs originated from the web, social networks or biological relations forces us to use simple algorithms if those graphs are to be computed in acceptable time \cite{garcia2014link}.
 
-To solve the link prediction problem, it needs to determine the formation or dissolution possibilities of links between all node pairs. Usually, such possibilities can be measured by similarities or relative ranks between node pairs. We use a generic framework to illustrate the link prediction solution as shown in Figure 7. For an initial social network, there are two ways to predict the link evolution: similarity-based approaches and learning-based approaches. Here we take predicting the new/missing/unobserved links as examples. A similarity-based approach is to compute the similarities on non-connected pairs of nodes in a social network, namely, it is based on measures for analyzing the proximity of nodes. Every potential node pair (x, y) would be assigned a score, where higher score means higher probability that x and y will be linked in the future, and vice versa. Then a ranked list in decreasing order of scores is obtained and links at the top of the list are most likely to appear. A learning-based approach is treating the link prediction problem as a binary classification task \cite{al2006link}. Therefore, some typical machine learning models such as classifiers and probabilistic models can be used for solving this problem. Each non-connected pair of nodes corresponds to an instance with features describing nodes and the class label. If there is a potential link connecting a pair of nodes, this pair is labeled as positive, otherwise it is negative. For the learning-based approaches, the features consist of two parts: one is the similarity features from the similarity-based approaches, another is the features derived from the social network, such as the textual information of attributes and domain knowledge. Link prediction for deleting/disappearing links can be solved analogously \cite{wang2014link}.
-
-Computing the similarity between a node pair is an intuitive solution for link prediction. It is based on the simple idea: the more similar the pair is, the more likely a link between them, and vice versa. This is consistent with the fact that users tend to create relationships with people who are similar in education, religions, interests and locations. It can be measured by the similarity, in which each nonconnected pair of nodes (x, y) is assigned a score signifying similarity between x and y. A high score indicates high probability that x and y will be linked in the future, while a low score also indicates high probability that x and y will not be linked. Therefore, using the rank of similarity scores, we can predict the appearing or disappearing links in the future or unseen links in current networks \cite{wang2014link}.
+Usually, the possibilities of such missing/future links can be measured by similarities metrics between node pairs \cite{wang2014link, arrar2023comprehensive}. Computing the similarity between a node pair is an intuitive solution for link prediction. It is based on the simple idea: the more similar the pair is, the more likely a link between them, and vice versa. This is consistent with the fact that users tend to create relationships with people who are similar in education, religions, interests and locations. It can be measured by the similarity, in which each potential node pair (x, y) is assigned a score signifying similarity between x and y. A high score indicates high probability that x and y will be linked in the future, while a low score also indicates high probability that x and y will not be linked. A ranked list in decreasing order of scores can then be obtained, and links at the top of the list are most likely to appear \cite{wang2014link}. Therefore, using the rank of similarity scores, we can predict missing/future links in graphs \cite{wang2014link}. The most similarity measures between nodes, used in link prediction studies, are local, quasi-local, and global indices \cite{arrar2023comprehensive}. Link prediction for deleting/disappearing links can be solved analogously \cite{almansoori2012link}.
 
 
+\ignore{What is the link prediction problem? Why is it similar to a compression/GAN problem? Understand the given network, and predict the missing links. Why it can never be 100\% precise, but precise enough?}
 
-
-
-
-\subsection{Link prediction}
-
-The size of graphs originated from the web, social networks or biological relations forces us to use very simple algorithms if those graphs are to be computed in acceptable time \cite{garcia2014link}.
-
-The smallest graph we use has 89,000 nodes and the largest 17 million. Their ratio of positive:negative edges goes from 1:11,000 in the best case (Wordnet) to 1:27 million in the worst case (Wikipedia). This huge imbalance makes LP a needle in a haystack problem, where we are trying to find a tiny set of correct edges within a huge set of incorrect ones. This inconvenient setting must not be considered as something abnormal or to be fixed. Instead we must accept it as an intrinsic property of large and sparse graphs and try to work around it \cite{garcia2014link}.
-
-Overcoming imbalance. Link prediction problem always suffers from extreme imbalance, namely, the number of links known to be present is often much less than the number of links known to be absent. This imbalance hampers the effectiveness of many link prediction methods \cite{wang2014link}.
-
-Current link prediction experimental results are usually in very low evaluation metrics values \cite{wang2014link}.
-
-A few works discuss the prediction of links that will disappear in the future \cite{almansoori2012link}.
-
-Similarity is a measure used to evaluate the level of similarity or connection between two nodes in a network \cite{arrar2023comprehensive}. It is frequently used to predict the likelihood of a link forming between two nodes that are not currently connected in the network \cite{arrar2023comprehensive}. The most similarity measures between nodes, used in link prediction studies, are local, quasi-local, and global indices \cite{arrar2023comprehensive}.
-
-Local indices, such as Common Neighbours \cite{newman2001clustering}, Salton Index \cite{salton1973specification}, Jaccard Index \cite{jaccard1901etude}, Sorensen Index \cite{sorensen1948method}, Hub Promoted Index \cite{liben2003link}, Preferential Attachment Index \cite{barabasi1999emergence}, Adamic–Adar Index \cite{adamic2003friends}, and Resource Allocation Index \cite{zhou2010solving}, calculate scores based on the neighborhood information of nodes with a path distance less than two \cite{arrar2023comprehensive}.
-
-Global indices use information from the entire network to calculate scores with a path distance greater than two \cite{arrar2023comprehensive}.
-
-Quasi-local indices combine the advantages of local and global indices and calculate scores for nodes with a path distance of no more than two \cite{arrar2023comprehensive}.
+\ignore{How do you explore the neighbors of each node, and compute intersection? What is a super naive way to do the above?}
 
 
 
 \subsection{Neighborhood-based Similarity Metrics}
 
-TODO.
+The most similarity measures between nodes, used in link prediction studies, are local, quasi-local, and global indices \cite{arrar2023comprehensive}. Local / neighborhood-based similarity metrices, such as Common Neighbours \cite{newman2001clustering}, Salton Index \cite{salton1973specification}, Jaccard Index \cite{jaccard1901etude}, Sorensen Index \cite{sorensen1948method}, Hub Promoted Index \cite{liben2003link}, Preferential Attachment Index \cite{barabasi1999emergence}, Adamic–Adar Index \cite{adamic2003friends}, and Resource Allocation Index \cite{zhou2010solving} are used to calculate scores based on the neighborhood information of nodes with a path distance less than two \cite{arrar2023comprehensive}. On the other hand, global indices use information from the entire network to calculate scores with a path distance greater than two \cite{arrar2023comprehensive}, while quasi-local indices combine local and global indices and calculate scores for nodes with a path distance of no more than two \cite{arrar2023comprehensive}. In social network analysis, the similarity measure based on the number of common neighbors is often used as a first-order heuristic function to predict potential friendship relations \cite{arrar2023comprehensive}. Optimizating computation of local similarity metrices are thus important. Further, extensive experiments \cite{ghasemian2020stacking} show that no known link predictor performs best or worst across all inputs \cite{zhou2021progresses}. Thus, we discuss many metrices here.
+
+\ignore{However, this heuristic may not be effective when it is applied to protein–protein interaction networks. In these types of networks, two proteins sharing many common neighbors may still have a low probability of interacting, making this heuristic a non-reliable predictor in this context \cite{arrar2023comprehensive}.}
 
 
-\subsection{Precision}
 
-Precision is a metric used to evaluate the performance of a link prediction model. It measures the proportion of correctly classified positive links (i.e. links that actually exist) among all classified positive links \cite{arrar2023comprehensive}.
 
-\begin{equation}
-\label{eq:precision}
-  \text{Precision} = \frac{TP}{TP + FP}
-\end{equation}
+\subsubsection{Common Neighbors (CN)}
 
-Recall is the ratio of correctly classified positive links to the total number of positive links \cite{arrar2023comprehensive}.
+The Common Neighbors (CN) metric measures the number of common neighbors between two vertices $i$ and $j$ in a graph, as shown in Equation \ref{eq:cn}. It is a widely used similarity measure, mainly due to its simplicity \cite{newman2001clustering}. As it is not normalized, it might be problematic when comparing node pairs with varying degrees of connectivity.
 
 \begin{equation}
-\label{eq:recall}
-  \text{Recall} = \frac{TP}{TP + FN}
+\label{eq:cn}
+  CN(i, j) = |\Gamma_i \cap \Gamma_j|
 \end{equation}
 
-F1 Score is a measure of the balance between precision and recall \cite{arrar2023comprehensive}.
 
-\begin{equation}
-\label{eq:f1score}
-  \text{F1 score} = 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}
-\end{equation}
-
-Accuracy is a metric that indicates the percentage of correctly classified links by a link prediction model \cite{arrar2023comprehensive}.
-
-\begin{equation}
-\label{eq:accuracy}
-  \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-\end{equation}
-
-Area Under the Receiver (AUC) \cite{hanley1982meaning} is the area under the receiver operating characteristic curve (ROC) is a measure of the model’s ability to distinguish between positive and negative links \cite{arrar2023comprehensive}. A higher AUC value indicates a more efficient algorithm compared to random choice \cite{mumin2022efficient}. 
-
-
-In social network analysis, the similarity measure based on the number of common neighbors is often used as a first-order heuristic function to predict potential friendship relations. It has been shown to achieve satisfactory performance \cite{arrar2023comprehensive}.
-
-However, this heuristic may not be effective when it is applied to protein–protein interaction networks. In these types of networks, two proteins sharing many common neighbors may still have a low probability of interacting, making this heuristic a non-reliable predictor in this context \cite{arrar2023comprehensive}.
-
-
-
-\subsection{Jaccard Coefficient (JC)}
+\subsubsection{Jaccard Coefficient (JC)}
 
 The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a similarity measure commonly used in network analysis and link prediction. It provides a normalized assessment of the similarity between two nodes in a graph, in terms of their neighborhoods. JC is defined such that it assigns higher values to pairs of nodes that share a greater proportion of common neighbors relative to their total number of neighbors, as given in Equation \ref{eq:jc}.
 
@@ -85,9 +38,7 @@ The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a similarity measure com
 \end{equation}
 
 
-
-
-\subsection{S{\o}rensen Index (SI)}
+\subsubsection{S{\o}rensen Index (SI)}
 
 The S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as the S{\o}rensen–Dice coefficient, is another similarity metric commonly applied in network analysis and link prediction. This metric, defined by Equation \ref{eq:si}, extends beyond solely accounting for the size of common neighbors and introduces the idea that nodes with lower degrees are more likely to form links.
 
@@ -97,9 +48,7 @@ The S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as the S{\o}ren
 \end{equation}
 
 
-
-
-\subsection{Salton Cosine similarity (SC)}
+\subsubsection{Salton Cosine similarity (SC)}
 
 The Salton Cosine similarity (SC) \cite{salton1973specification} is a frequently used cosine metric in the context of measuring similarity between two nodes in a graph. It essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $i$ and $j$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
 
@@ -109,9 +58,7 @@ The Salton Cosine similarity (SC) \cite{salton1973specification} is a frequently
 \end{equation}
 
 
-
-
-\subsection{Hub Promoted (HP)}
+\subsubsection{Hub Promoted (HP)}
 
 The Hub Promoted (HP) score \cite{liben2003link} is a metric that assesses the topological overlap between two nodes, denoted as $i$ and $j$, in a graph. It is defined by the formula given in Equation \ref{eq:hp}. The HP score is particularly influenced by the lower degree of nodes, and can be valuable in scenarios where the involvement of lower-degree nodes is considered important in understanding network connectivity.
 
@@ -121,9 +68,7 @@ The Hub Promoted (HP) score \cite{liben2003link} is a metric that assesses the t
 \end{equation}
 
 
-
-
-\subsection{Hub Depressed (HD)}
+\subsubsection{Hub Depressed (HD)}
 
 In contrast to the HP score, the Hub Depressed (HD) score \cite{zhou2009predicting} is determined by the higher degrees of nodes. It can be particularly useful in cases where the influence of highly connected nodes on network structure is of interest. The HD score between two nodes $i$ and $j$ in the graph is defined as per Equation \ref{eq:hd}.
 
@@ -133,9 +78,7 @@ In contrast to the HP score, the Hub Depressed (HD) score \cite{zhou2009predicti
 \end{equation}
 
 
-
-
-\subsection{Leicht-Holme-Nerman (LHN)}
+\subsubsection{Leicht-Holme-Nerman (LHN)}
 
 The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metric that assigns high similarity to node pairs that exhibit a greater number of common neighbors than would be expected by random chance. One may use Equation \ref{eq:lhn} to compute the LHN score between two nodes $i$ and $j$ in a graph.
 
@@ -145,9 +88,7 @@ The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metr
 \end{equation}
 
 
-
-
-\subsection{Adamic-Adar coefficient (AA)}
+\subsubsection{Adamic-Adar coefficient (AA)}
 
 The Adamic-Adar coefficient (AA) \cite{adamic2003friends} is a measure designed to capture the notion that connections to common neighbors with fewer links are more informative and indicative of similarity between nodes in a network. The formula for this metric is given by Equation \ref{eq:aa}, where $\Gamma_i$ and $\Gamma_j$ represent the neighbors of node $i$ and $j$. The weight assigned to each common neighbor is inversely proportional to the logarithm of the number of neighbors that neighbor has. This logarithmic weighting downplays the influence of common neighbors with very high degrees, making the metric less sensitive to connections with nodes that are overly connected in the network. The AA metric metric thus captures the idea that connections to less common neighbors provide more discriminative information about the similarity between nodes.
 
@@ -157,9 +98,7 @@ The Adamic-Adar coefficient (AA) \cite{adamic2003friends} is a measure designed 
 \end{equation}
 
 
-
-
-\subsection{Resource Allocation (RA)}
+\subsubsection{Resource Allocation (RA)}
 
 The Resource Allocation (RA) \cite{zhou2010solving} metric was originally motivated by the concept of resource allocation, or heat diffusion, across a user-object network. It reflects the intuition that heavily connected nodes may already have abundant connections and may not play as critical a role in facilitating resource flow between two other nodes. Unlike AA, high-degree common neighbors are penalized more heavily in the RA metric. The formula for RA score between two nodes $i$ and $j$ is given by Equation \ref{eq:ra}.
 
@@ -168,6 +107,61 @@ The Resource Allocation (RA) \cite{zhou2010solving} metric was originally motiva
   RA(i, j) = \sum_{k\ \in\ \Gamma_i \cup \Gamma_j} \frac{1}{|\Gamma_k|}
 \end{equation}
 
-CN, AA, PA and RA, are not normalized, that means the similarities under these metrics only have the ranking meanings \cite{wang2014link}.
+Note that the CN, AA, and RA similarity metrics are not normalized. This mean that similarities under these metrics only have the ranking meanings \cite{wang2014link}. Finally, we should draw attention to the fact that, although there are many existing neighbor-based metrics, in practical applications, one should choose the right metrics according to the characteristics of social networks, because many experiment evaluation results have shown that there is no absolutely dominating metric for different datasets \cite{liben2003link, wang2014link, zhou2021progresses}.
+%% NOTE; What is the complexity of each similarity metric. Mention at the end of all in preliminaries.
 
-Finally, we should draw attention to the fact that, although there are many existing neighbor-based metrics, in practical applications, one should choose the right metrics according to the characteristics of social networks, because many experiment evaluation results have shown that there is no absolutely dominating metric for different datasets \cite{liben2003link, wang2014link}.
+
+
+
+\subsection{Measuring Prediction Quality}
+
+There are a number of metrics used to evaluate the performance of a link prediction model \cite{arrar2023comprehensive}. Performance evaluation metrics can be roughly divided into two categories: threshold-dependent, and threshold-independent metrics \cite{zhou2021progresses}. Precision and recall are the two most widely used metrics in the former category, while Area Under the ROC Curve (AUC), where ROC stands for Receiver operating characteristic, is the most widely used in the later category. To test the algorithm’s accuracy, the observed link, $E$, is divided into two parts: the training set $E^T$ is treated as known information, while the probe set $E^P$ is used for algorithm evaluation, and no information in $E^P$ is allowed to be used for prediction. The majority of known studies applied ‘‘random division’’, namely $E^P$ is randomly drawn from $E$ \cite{zhou2021progresses}.
+
+\ignore{Current link prediction experimental results are usually very low in evaluation metrics values \cite{wang2014link}.}
+
+
+\subsubsection{Precision}
+
+Precision is a metric used to evaluate the performance of a link prediction model. It measures the proportion of correctly classified positive links (i.e. links that actually exist) among all classified positive links \cite{arrar2023comprehensive}.
+
+Precision is defined as the ratio of relevant items selected to the number of items selected \cite{zhou2021progresses}, i.e., it measures the proportion of correctly classified positive links (i.e. links that actually exist) among all classified positive links \cite{arrar2023comprehensive}. In other words, if we take the top-$L$ links as the predicted ones; among which $L_r$ links are correctly predicted; then, the Precision equals $L_r/L$ \cite{zhou2021progresses}. Equation \ref{eq:precision} gives the formula for computing precision.
+
+\begin{equation}
+\label{eq:precision}
+  \text{Precision} = \frac{TP}{TP + FP}
+\end{equation}
+
+
+\subsubsection{Recall}
+
+Recall is defined as the ratio of relevant items selected to the total number of relevant items (say $L_r = |E^P|$) \cite{zhou2021progresses}, or the ratio of correctly classified positive links to the total number of positive links \cite{arrar2023comprehensive}. The formula for calculating recall in given in Equation \ref{eq:recall}. A widely adopted way is setting $L = |E^P|$, at which precision = recall \cite{lu2011link, liben2003link, zhou2021progresses}. Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
+
+\begin{equation}
+\label{eq:recall}
+  \text{Recall} = \frac{TP}{TP + FN}
+\end{equation}
+
+
+\subsubsection{F1 Score}
+
+F1 Score is a measure of the balance between precision and recall \cite{arrar2023comprehensive}. It can calculated as the harmonic mean of percision and recall, as shown in Equation \ref{eq:f1score}.
+
+\begin{equation}
+\label{eq:f1score}
+  \text{F1 score} = 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{equation}
+
+
+\subsubsection{Accuracy}
+
+Accuracy is a metric that indicates the percentage of correctly classified links by a link prediction model \cite{arrar2023comprehensive}. It can be calculated using Equation \ref{eq:accuracy}.
+
+\begin{equation}
+\label{eq:accuracy}
+  \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
+
+
+\subsubsection{Area Under the ROC Curve (AUC)}
+
+Area Under the Receiver (AUC) \cite{hanley1982meaning} is the area under the receiver operating characteristic curve (ROC) is a measure of the prediction algorithm's ability to distinguish between positive and negative links \cite{arrar2023comprehensive}. A higher AUC value indicates a more efficient algorithm compared to random choice \cite{mumin2022efficient}. However, AUC is inadequate to evaluate the early retrieval performance which is critical in real applications \cite{zhou2021progresses}. AUC will give misleadingly overhigh score to algorithms that can successfully rank many negatives in the bottom while this ability is less significant in imbalanced learning \cite{yang2015evaluating, lichtnwalter2012link}.

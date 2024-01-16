@@ -3,38 +3,63 @@
 
 \subsubsection{System used}
 
-We employ a server equipped with two Intel Xeon Gold 6226R processors, each featuring $16$ cores running at a clock speed of $2.90$ GHz. Each core is equipped with a $1$ MB L1 cache, a $16$ MB L2 cache, and a $22$ MB shared L3 cache. The system is configured with $376$ GB RAM and set up with CentOS Stream 8.
+We use a server outfitted with two Intel Xeon Gold 6226R processors. Each processor comprises $16$ cores operating at $2.90$ GHz. Each core has a $1$ MB L1 cache, a $16$ MB L2 cache, and a shared L3 cache of $22$ MB. The system is set up with $376$ GB of system memory and has CentOS Stream 8 installed.\ok{}
 
 
 \subsubsection{Configuration}
 
-We use 32-bit integers for vertex ids and 32-bit float for edge weights but use 64-bit floats for computations and hashtable values. We utilize $64$ threads to match the number of cores available on the system (unless specified otherwise). For compilation, we use GCC 8.5 and OpenMP 4.5.
-
-%% From LP SRS
-We use 32-bit integers for vertex ids and 32-bit float for edge weights but use 64-bit floats for computations and hashtable values. We utilize $64$ threads to match the number of cores available on the system.
+We employ 32-bit integers to represent vertex IDs and 32-bit floats for score computation. We utilize $32$ threads to match the system core count (unless specified otherwise). Compilation is carried out using GCC 8.5 and OpenMP 4.5.\ok{}
 
 
 \subsubsection{Dataset}
 
 The graphs used in our experiments are given in Table \ref{tab:dataset}. These are sourced from the SuiteSparse Matrix Collection \cite{suite19}. In the graphs, number of vertices vary from $3.07$ to $214$ million, and number of edges vary from $25.4$ million to $3.80$ billion. We ensure edges to be undirected and weighted with a default of $1$.
 
-%% From LP SRS
-For the experiments, we use $13$ graphs from the SuiteSparse Matrix Collection\ignore{\cite{suite19}}. In the graphs, number of vertices vary from $3.07$ to $214$ million, and number of edges vary from $25.4$ million to $3.80$ billion. We ensure edges to be undirected and weighted with a default of $1$. For each graph, we generate uniformly random batch of edge deletions of size $10^{-7} |E|$ to $0.1 |E|$. For each batch size, we generate five random batch updates for averaging.
+
+\subsubsection{Observed Graph generation}
+
+To generate the observed graphs, we take each graph from the dataset and randomly remove $10^-4|E|$ to $0.1|E|$ edges from it --- where the endpoints of removed edges are chosen with uniformly probability.\ignore{For each batch size, we generate five random batch updates for averaging.}
+
+\ignore{Are there no missing links in the original graphs?}
 
 \input{src/tab-dataset}
-% \input{src/fig-leiden-compare}
-% \input{src/fig-gve-compare}
 
 
 
 
-\subsection{Comparing Performance of GVE-Leiden}
+\subsection{Comparative Performance Evaluation}
+%% Performance Comparison
 
-Upon each graph with edge deletions of batch size $B$ applied, we then predict the same number of edges $B$ using both JC and HP similarity scores. As mentioned in Section \ref{sec:approach}, we avoid high-degree first-order neighbors. For this, we adjust the degree threshold $D$ from $4$ to $32$ in multiples of $2$.
+In this section, we compare the performance of our approach, i.e., disregarding large hubs, and compare it with the default approach. We does this for observed graphs based on each graph in the dataset, with $10^-2|E|$ to $0.1|E|$ edges removed (the endpoints of removed edges are chosen with uniformly probability, as mentioned above), and predict the same number of edges with both approaches. For each observed graph, we predict links using the default approach, and our approach with suitable $MAX\_MEDIATOR\_DEGREE$, as identified in Section X. In Figures X, Y, and Z, we plot the runtimes, speedup, and precision respectively of only the best approach for each graph (both in terms of precision and runtime). In the figures, the labels indicate the acronyms of the similarity metric used, followed by the value of $MAX\_MEDIATOR\_DEGREE$ ($\Pi$) parameter setting (i.e., the label $HP4$ stands for the Hub Promoted similarity metric, with a $MAX\_MEDIATOR\_DEGREE$ of $4$, i.e., we avoid first order neighbors with degree greater than $4$). Note that a $MAX\_MEDIATOR\_DEGREE$ of $\infty$ is essentially the default/baseline approach. As Figures X, Y, and Z show, our approach is on average X times faster than the baseline/default approach, while predicting links with on average X\% higher precision. On the \textit{sk-2005} graph with $0.1|E|$ edges removed, our approach achieves a link prediction rate of X edges/s, and a processing rate of Y edges/s.
 
-Figure X shows the average runtime of link prediction with degree threshold $D$ of $4$, $8$, $16$, and $32$. Increasing $D$ increases runtime by a small amount, due to increase second-degree neighbor exploration. Increasing/decreasing the batch size however does not have an effect on runtime, as the algorithm must continue to explore possible links with higher scores even if batch/prediction size $B$ edges have been added to the prediction list. Note that runtime for link prediction with JC/HP similarity scores is nearly identical. On a batch size of $0.1 |E|$, we compare the predicted links with the links in the original graphs (without edge deletions). We observe that HP-based link prediction with $D = 16$ obtains the highest average accuracy of $2.4\%$, while HP-based link prediction with $D = 4$ obtains the highest average precision of $6.4\%$. Given the vast set of potential predictions (${}_N C_2 - |E|$), achieving high accuracy and precision remains a challenge.
+Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
 
-TODO.
+\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
+
+\ignore{Explain the confusion y-axis on precision.}
+
+\ignore{Sizes of graphs are large so running other approaches (\Pi) is expensive.}
+
+\ignore{What is the processing / prediction rate? (by predicted edges, and by number of edges in the graph)}
+
+\ignore{Comparison with baseline approach ($\infty$), i.e., exploring all possible/reachable pairs at distance 2, and quickly computing intersection, scores, adding to heap, and merging across threads. Explain with figure in approach.}
+
+\ignore{Why not showcase 0.01 E and 0.1 E, and remove the other plots?}
+
+\ignore{Runtime + speedup + precision for $0.1|E|$.
+Lu et al. \cite{lu2015toward} use precision.}
+
+\ignore{Why is precision low?}
+\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
+\ignore{It is possible that our algorithm only explores one type of connection, but the networks have various types of connections.}
+\ignore{Quantifying a network's link predictability allows us to (i) evaluate predictive algorithms associated with the network, (ii) estimate the extent to which the organization of the network is explicable, and (iii) monitor sudden mechanistic changes during the network's evolution. The hypothesis of this paper is that a group of links is predictable if removing them has only a small effect on the network's structural features. We introduce a quantitative index for measuring link predictability and an algorithm that outperforms state-of-the-art link prediction methods in both accuracy and universality. This study provides fundamental insights into important scientific problems and will aid in the development of information filtering technologies \cite{lu2015toward}.}
+\ignore{Are there no missing links in the original graphs?}
+\ignore{Arent graphs heterogeneous? Why one method works?}
+\ignore{Why do these methods perform well?}
+
+\ignore{Can you show details plots? No.}
+
+% Figure X shows the average runtime of link prediction with degree threshold $D$ of $4$, $8$, $16$, and $32$. Increasing $D$ increases runtime by a small amount, due to increase second-degree neighbor exploration. Increasing/decreasing the batch size however does not have an effect on runtime, as the algorithm must continue to explore possible links with higher scores even if batch/prediction size $B$ edges have been added to the prediction list. Note that runtime for link prediction with JC/HP similarity scores is nearly identical. On a batch size of $0.1 |E|$, we compare the predicted links with the links in the original graphs (without edge deletions). We observe that HP-based link prediction with $D = 16$ obtains the highest average accuracy of $2.4\%$, while HP-based link prediction with $D = 4$ obtains the highest average precision of $6.4\%$. Given the vast set of potential predictions (${}_N C_2 - |E|$), achieving high accuracy and precision remains a challenge.
 
 \input{src/fig-input-large}
 \input{src/fig-strong-scaling}
@@ -42,15 +67,34 @@ TODO.
 
 
 
-\subsection{Analyzing Performance of GVE-Leiden}
+\subsection{Selecting Suitable Similarity Metric}
 
-It is possible that our algorithm only explores one type of connection, but the networks have various types of connections.
+Extensive experiments \cite{ghasemian2020stacking} show that no known link predictor performs best or worst across all inputs \cite{zhou2021progresses}.\ignore{We expect a larger fraction of algorithms in the future studies will be designed for networks of particular types \cite{zhou2021progresses}.} In this section, we select a suitable similarity metric for link prediction for each type of graph. For this, we generate observed graphs from each graph in the dataset, such that $10^-4|E|$ to $0.1|E|$ edges are removed (the endpoints of removed edges are chosen with uniformly probability), and predict the same number of edges using the best approach for each observed graph (as identified in Section X).
+
+In Figures X and Y, we plot the runtimes and precision of the best approach for each graph (both in terms of precision and runtime). As above, the labels in the figures indicate the acronyms of the similarity metric used, followed by the value of $MAX\_MEDIATOR\_DEGREE$ ($\Pi$) parameter setting. As Figures X, Y, and Z show, approach X is suitable for web graph. On a set of smaller graphs (not shown here), we observe that approach X is suitable for co-citation graphs.
+
+\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
+
+\ignore{Explain the confusion y-axis on precision.}
+
+\ignore{Selecting best approach based on precision and runtime, for batch size $10^{-4}|E|$ to $0.1|E|$, and present the result. The runtime and precision of each method (appendix).}
+
+\ignore{Sizes of graphs are large so running other approaches is expensive.}
+
+\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
+
+\ignore{What we observe on our dataset? What we observe on smaller graphs?}
+
+\ignore{Why the choice of best method appears to change with batch size?}
 
 
 
 
-\subsection{Strong Scaling of our Optimized Neighbor-based Link Prediction Methods}
+
+\subsection{Strong Scaling}
 
 Finally, we assess the strong scaling performance of our optimized neighbor-based link prediction methods. In this analysis, we vary the number of thread from $1$ to $32$ in multiples of $2$ for each input graph, and measure the average time taken to predict $10^{-2}|E|$ links by Hub Promoted (HP), Leicht-Holme-Nerman (LHN), Adamic-Adar Coefficient (AA), and Resource Allocation (RA) based link prediction methods with the \textit{MAX\_MEDIATOR\_DEGREE} parameter set to $4$. The results are shown in Figure \ref{fig:strong-scaling}. It not only illustrates the overall scaling performance, but the also scaling of the two phases of each link prediction method, i.e., identifying edges with top-k scores in each thread (scoring phase), and combining the scores obtained by each thread to obtain the global top-k edges (merging phase). With $32$ threads, our optimized link prediction methods achieve an overall speedup of $7.2\times$ (with respect to sequential execution), indicating a performance increase of $1.5\times$ for every doubling of threads. The scalability is limited, as the cost of the merging phase increases with an increase in the number of threads. In fact, at $32$ threads, the merging phase obtains a speedup of $0.7\times$ (yes it is less than $1$\ignore{, as its runtime increases}), while the scoring phase achieves a speedup of $18.5\times$.
+
+\ignore{Why is string scaling of our link prediction approach low? Why is it especially for the merging phase?}
 
 \input{src/fig-input-small}

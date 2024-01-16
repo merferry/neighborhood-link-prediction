@@ -1,3 +1,16 @@
+%% How is link prediction computed?
+%% What is local/neighborhood-based link prediction?
+%% What are similarity measures? Why are they used with link prediction?
+%% If similarity measures are simple, why are they used?
+%% What are the main issues currently?
+%% Why is link prediction hard?
+%% Why are existing approaches bad?
+%% Why are solving these important?
+%% Why is parallelization/shared-memory setting important?
+
+
+Link prediction in network analysis involves diverse algorithms, with neighborhood-based and machine learning-based methods being prominent.
+
 Heterogeneous networks with different types of nodes and links require different approaches to those used in homogeneous networks \cite{sun2012will}.
 
 Low-Rank Approximation: This method simplifies the structure of the network to reduce its noise using the adjacency matrix A representation of the graph by solving the low-rank approximation problem \cite{kunegis2009learning}. Unfortunately, this technique is not practical for large matrices due to lack of numerical accuracy \cite{martinez2016survey}.
@@ -12,3 +25,33 @@ The authors report the complexity of various algorithms in terms of the number o
 \cite{zhou2021progresses}
 
 Link prediction algorithms have been used in evaluating and inferring network evolving mechanisms \cite{wang2012evaluating, zhang2015measuring, zhang2017uncovering}, testing the privacy-protection algorithms (as an attaching method) \cite{xian2021towards}, evaluating and designing network embedding algorithms \cite{dehghan2022evaluating, gu2021learning}, and so on.
+
+
+
+
+
+%% Could be in related work as well.
+Ghasemian et al. \cite{ghasemian2020stacking} argues that the ensemble models are usually superior to individual algorithms.
+An individual algorithm could be highly cost-effective for its competitive performance and low complexity in time and space \cite{zhou2021progresses}.
+In some real applications like friend recommendation, predictions with explanations are more acceptable \cite{barbieri2014follow}, which cannot be obtained by ensemble learning.
+
+A network embedding algorithm will produce a function so that every node is represented by a low-dimensional vector \cite{cui2018survey}. Then, the existence likelihood of a non-observed link can be estimated by the inner product, the cosine similarity, the Euclidean distance, or the geometrical shortest path of the two learned vectors \cite{cui2018survey, cannistraci2013minimum}.
+On the one hand, embedding is currently a very hot topic in network science and thought to be a promising method for link prediction. On the other hand, some very recent empirical studies \cite{muscoloni2022adaptive, mara2020benchmarking, ghasemian2020stacking} involving more than a thousand networks showed negative evidence that network embedding algorithms perform worse than some elaborately designed mechanistic algorithms.
+Another notable embedding method is based on the hyperbolic network model \cite{krioukov2010hyperbolic, papadopoulos2012popularity}, where each node is represented by only two coordinates (i.e., d = 2) in a hyperbolic disk.
+
+Matrix completion aims to reconstruct a target matrix, given a subset of known entries. Since links can be fully conveyed by the adjacency matrix A, it is natural to regard link prediction as a matrix completion task. Matrix factorization is a very popular method for matrix completion, which has already achieved great success in a closely related domain, the design of recommender systems \cite{koren2009matrix}.
+Xian et al. \cite{xian2020netsre} suggested that the structural regularity corresponds to redundant information in the adjacency matrix, which can be characterized by a low-rank and sparse representation matrix. Sun et al. \cite{sun2020revealing} proposed a more direct method to measure such redundancy. Their train of thought is that a more predictable network contains more structural redundancy and thus can be compressed by a shorter binary string.
+Koutra et al. \cite{koutra2015summarizing} found that the major part of a seemingly complicated real network can be represented by a few elemental substructures like cliques, stars, chains, bipartite cores, and so on. Inspired by this study, Xian et al. \cite{xian2020netsre} claimed that a network is more regular and thus more predictable if it can be well represented by a small number of subnetworks. 
+
+Link prediction is essentially a compression problem [SAYS ME].
+
+
+
+
+
+
+Similarity measures are commonly used to predict the likelihood of a missing/future link between two nodes that are not currently connected in the network \cite{wang2014link, arrar2023comprehensive}. These include local/neighborhood-based similarity metrics such as Common Neighbors, Jaccard Coefficient,  S{\o}rensen Index, Salton Cosine similarity, Hub Promoted, Hub Depressed, Leicht-Holme-Nerman, Adamic-Adar, and Resource Allocation \cite{arrar2023comprehensive, wang2014link}, which are based of are based on neighborhood information within a path distance of two. The underlying principle is straightforward: the higher the similarity between a pair, the greater the likelihood of a connection between them, and vice versa. This aligns with the observation that individuals often form relationships with others who share similar educational backgrounds, religious beliefs, interests, and geographical locations \cite{wang2014link}. The choice of similarity metrics depends on the characteristics of the social network, as no single metric dominates across different datasets \cite{arrar2023comprehensive, zhou2021progresses}. The resulting similarity scores are then ranked, and links at the top of the list are considered most likely to appear in the future (or were missing in the first place) \cite{wang2014link}. Despite their simplicity of such similarity measures, the remain effective due to interpretability \cite{barbieri2014follow, pai2019netdx}, computational efficiency \cite{garcia2014link}, and the ability to capture underlying structural patterns. To assess the accuracy of link prediction algorithms, observed links $E$ are split into a training set $E^T$ and a probe set $E^P$ for evaluation. Precision, recall, F1 score, accuracy, and Area Under the Receiver Curve (AUC) are commonly used metrics.
+
+Unfortunately, the link prediction problem suffers from extreme imbalance, namely, the number of links known to be present is often much less than the number of links known to be absent. Garcia et al. \cite{garcia2014link} observe that this ratio goes from $1 : 11k$ in their best case to $1 : 27M$ in the worst case. This huge imbalance makes link prediction a needle in a haystack problem, where we are trying to find a tiny set of correct edges within a huge set of incorrect ones \cite{garcia2014link, wang2014link}. This imbalance hampers the effectiveness of many link prediction methods \cite{wang2014link}. Further, early studies often compare a very few algorithms on several small networks according to one or two metrics \cite{zhou2021progresses}. Recent experiments \cite{mara2020benchmarking, ghasemian2020stacking, muscoloni2022adaptive, zhou2021experimental} indicate that the above methodology may result in misleading conclusions. However, a large number of existing research work on link prediction do not focus on solving the problem on large networks, with close to a billion edges \cite{muscoloni2022adaptive, mumin2022efficient, nasiri2021novel, xian2021towards, ghasemian2020stacking, mara2020benchmarking, wang2019link, xu2019distributed, mohan2017scalable, cui2016bounded, garcia2014link, papadimitriou2012fast}. However, we are interested in addressing the problem for large networks. Area Under the Receiver (AUC) \cite{hanley1982meaning} is the area under the receiver operating characteristic curve (ROC) is a measure of the prediction algorithm's ability to distinguish between positive and negative links \cite{arrar2023comprehensive}. A higher AUC value indicates a more efficient algorithm compared to random choice \cite{mumin2022efficient}. However, AUC is inadequate to evaluate the early retrieval performance which is critical in real applications \cite{zhou2021progresses}. AUC will give misleadingly overhigh score to algorithms that can successfully rank many negatives in the bottom while this ability is less significant in imbalanced learning \cite{yang2015evaluating, lichtnwalter2012link}. Instead of the AUC metric, we focus on F1 score, which is the haromic mean of precision and recall. Further, efficient parallelization is crucial for handling large-scale networks and improving the computational efficiency of link prediction algorithms, making them more practical for real-world applications. Shared-memory settings enable faster computation by utilizing multiple processors simultaneously. In recent years, the collection of data and the relationships among them, represented as graphs, have reached unmatched levels. This has necessitated the design of efficient parallel algorithms for link prediction on large networks. The multicore/shared memory setting is crucial for link prediction due to its energy efficiency and the prevalence of hardware with extensive DRAM sizes. However, many of the current algorithms for link prediction are challenging to parallelize due to their irregular and inherently sequential nature, in addition to the complexities of handling concurrency, optimizing data access, reducing contention, minimizing load imbalance.
+
+Early studies often compare a very few algorithms on several small networks according to one or two metrics \cite{zhou2021progresses}. Recent large-scale experiments \cite{mara2020benchmarking, ghasemian2020stacking, muscoloni2022adaptive, muscoloni2021short, zhou2021experimental} indicated that the above methodology may result in misleading conclusions. Future studies ought to implement systematic analyses involving more synthetic and real networks, benchmarks, state-of-the-art algorithms, and metrics \cite{zhou2021progresses}.
