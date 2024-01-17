@@ -1,3 +1,120 @@
+Link prediction in network analysis involves diverse algorithms. This include the use of similarity-based methods, dimensionality reduction, and machine learning \cite{arrar2023comprehensive}. As mentioned earlier, the use of similarity measures for link prediction is based on the intuition that the more similar a pair of nodes are, the more likely a link between them, and vice versa. This is consistent with the fact that users tend to create relationships with people who are similar in education, religions, interests and locations \cite{wang2014link}. Similarity measures are commonly classified into three categories: local, quasi-local, and global measures. Local measures calculate scores based on the neighborhood information of nodes with a path distance less than two; global measures use information from the entire network to calculate scores with a path distance greater than two; while quasi-local measures combine local and global measures and calculate scores for nodes with a path distance of no more than two. Other similarity based approaches include the use of random walks and community detection \cite{arrar2023comprehensive}.
+
+Dimensionality reduction techniques \cite{coskun2015link} attempt to map the network's information into a lower dimensional space, while preserving its structural information and components. These include embedding-based methods and matrix factorization based methods. On the other hand, machine learning techniques utilize relevant extracted features from the network data to predict the probability of a link forming between two nodes based on these features. These include the use of supervised \cite{kumari2022supervised, abuoda2020link, lichtenwalter2010new}, unsupervised \cite{rossi2021closing}, reinforcement, and deep learning \cite{cui2018survey, arrar2023comprehensive}.
+
+While the above techniques effectively capture nonlinear relationships between nodes, and enable more accurate predictions within complex networks than similarity based approaches, they come with certain drawbacks. Embedding-based methods face challenges in predicting links for nodes with high centrality --- which have complex connectivity patterns and numerous connections to other nodes \cite{arrar2023comprehensive}. Matrix factorization methods depend heavily on accurately representing the observed network through a low-rank matrix, which may not be feasible for networks with complex structures \cite{martinez2016survey, arrar2023comprehensive}. Further, they require significant computational resources and may result in overfitting if it is not regulated properly, particularly in large-scale networks \cite{arrar2023comprehensive}.
+
+Machine learning based approaches have their own set of drawbacks. Supervised learning based methods require high-quality features to be extracted from the network, which requires domain expertise and can be challenging. As the network evolves, these features may also get outdated. They also need a large labelled dataset, obtaining which can be a time consuming task. Finally, supervised learning techniques have a high time complexity. While deep learning does not require feature extraction, it still requires a substantial about of labelled data, which can be challenging to acquire. Further, the interpretability of deep learning models is limited, and overfitting is also a potential concern.
+
+Similarity-based link prediction methods continue to stay relevant, despite their usually lower prediction accuracy. This is because the size of graphs originated from the web, social networks or biological relations force us to use very simple algorithms if those graphs are to be computed in acceptable time \cite{garcia2014link}. Similarity-based link prediction methods are highly cost-effective, as they offer competitive prediction quality with their low complexity in time and space \cite{zhou2021progresses}. Further, in certain applications like friend recommendation, preference is given to predictions with explanations, a feature not readily achievable through machine learning based techniques \cite{barbieri2014follow}.
+
+
+%% ON COMMON NEIGHBORS
+Yang et al. \cite{yang2015new} propose a new measure motivated by the cohesion between common neighbors and the predicted nodes, called Local Neighbors Link (LNL), and implement them in both MapReduce and Spark. They test on graphs of size $2.1k$ edges to $1.5M$ edges.
+Cui et al. \cite{cui2016bounded} propose a parallel algorithm to efficiently evaluate the Common Neighbors (CN) similarity metric for link prediction by obtaining all node pairs with CN values larger than a lower bound. They test their approach on graphs of size $88k$ to $14M$ edges.
+Guo et al. \cite{guo2019node} introduce Common Neighbour Tightness (CNT), an link prediction method that incorporates the aggregation degree of common neighbors by considering their proximity based on local information and neighborhood tightness. They test on graphs of size $914$ to $732k$ edges.
+Rafiee et al. \cite{rafiee2020cndp} introduce link prediction based on Common Neighbors Degree Penalization (CNDP), which considers clustering coefficient as a structural property and takes into account the neighbors of shared neighbors. They test on graphs of size $441$ to $42k$ edges.
+Mumin et al. \cite{mumin2022efficient} propose an algorithm that uses common neighbors in addition to the degree distribution of the nodes to estimate
+the possibility of the presence of a link between two nodes in a network based on local information. They experiment on small graph, with the number of edges ranging from $1.0k$ to $80k$, and show higher prediction accuracy compared with most of the local information based methods like the Common Neighbor and Preferential Attachment. Their approach is competitive with the quasi-local indicators such as LP and global indicators like Katz, with a lower computational complexity than the two.
+
+%% ON RANDOM WALK
+Papadimitriou et al. \cite{papadimitriou2012fast} propose a similarity-based link prediction algorithm by traversing all paths of limited length, based on small world hypothesis. They also present variants that apply to directed and signed graphs, and discuss a possible MapReduce implementation of their algorithm. They test on graph of size $3.7k$ edges to $132k$ edges.
+Kalkan and Hambiralovic \cite{kalkanfinding} propose a Personalized PageRank based methods for link prediction. They test on graphs of size $2.1k$ to $1.5M$ edges.
+%% ON DIFFUSION
+Vega-Oliveros et al. \cite{vega2021link} explore using susceptible-infected-recovered and independent cascade diffusion models for link prediction. Their proposed progressive-diffusion (PD) method, based on nodes' propagation dynamics, offers a stochastic discrete-time rumor model. They test on graphs of size $11k$ to $239k$.
+
+%% ON COMMUNITY
+Mohan et al. \cite{mohan2017scalable} propose a hybrid similarity measure for link prediction that used parallel label propagation for community detection, and a parallel community information-based Adamic-Adar measure for link prediction, using the Bulk Synchronous Parallel (BSP) programming model. They test on graphs of size $29k$ to $35M$ edges.
+Wang et al. \cite{wang2019link} proposes a link prediction algorithm with an adjustable parameter based on community information (CI). They apply the proposed algorithm to nine similarity indices, and a family of CI-based indices. Their results show that CI forms have better overall prediction performance, compared to tradition local indices. They then develop a parallel algorithm to apply the proposed CI-based link prediction algorithm to large-scale complex networks using Spark GraphX. They test on graphs of size $78$ to $17M$ edges.
+Bastami et al. \cite{bastami2019gravitation} present an unsupervised gravitation-based link prediction approach to accuracy improvement of local and global predictions by integrating node features, community information and graph properties to distribute and reduce of the prediction space. They test on graphs of size $1.6k$ to $100M$ edges.
+% ON CONNECTED COMPONENTS
+Saifi et al. \cite{saifi2023fast} propose an approach that operates on the connected components of a network instead of the whole network, which speeds up link prediction using local and path-based similarity measures. They test on datasets of size $441$ to $88k$ edges.
+
+%% ON APPROXIMATION
+Shin at al. \cite{shin2012multi} introduce Multi-Scale Link Prediction (MSLP), which that utilizes a tree-structured approximation algorithm to handle link prediction in large networks through efficient construction of low-rank approximations at multiple scales. They test on graph of size $44M$ to $92M$ edges.
+Garcia-Gasulla and Cort{\'e}s \cite{garcia2014link} propose a local link prediction algorithm based on the existence of an underlying hierarchical model. They also discuss points of parallelization, approximation, data locality aspects of link prediction algorithms for efficient computation. They test on graph of size $346k$ to $167M$, but focus only predicting edges only between $200k$ vertices.
+Ferreira et al. \cite{ferreira2019scalability} propose an approach based on the multilevel optimization paradigm to improve the scalability of any link prediction algorithm, by reducing the original network to a coarsened version. After applying the link prediction algorithm in the coarsened network, we show how to project the prediction results back to the original network. They test on graphs of size $2.7k$ to $121k$ edges.
+Benhidour et al. \cite{benhidour2022approach} propose a link prediction method for directed networks, leveraging the similarity-popularity paradigm. The algorithms approximate the hidden similarities as shortest path distances using edge weights that capture and factor out the links' asymmetry and nodes' popularity. They test on graphs of size $61$ to $120k$ edges.
+
+%% ON BIPARTITE
+Aslan and Kaya \cite{aslan2018topic} propose a similarity-based link prediction method based on strengthening weighted projection to predict the potential links between the authors and the topics in the large-scale bipartite academic information network created from the real-world data. They test on graph of size of upto $1.3M$ edges.
+Sarhangnia et al. \cite{sarhangnia2022novel} present a similarity measure of link prediction in bipartite social networks based on neighborhood structure. They test on graphs of size $81k$ to $267k$ edges.
+%% ON MULTIPLEX
+Sharma and Singh \cite{sharma2016efficient} propose an algorithm for weight prediction using Link similarity measures on multiplex networks. They test on graph of size $7.2k$ edges.
+
+
+%% ON PARALLEL
+%% ON COMMON NEIGHBORS
+Cui et al. \cite{cui2016bounded} propose a parallel algorithm to efficiently evaluate the Common Neighbors (CN) similarity metric for link prediction by obtaining all node pairs with CN values larger than a lower bound. They test their approach on graphs of size $88k$ to $14M$ edges.
+%% ON COMMUNITY
+Wang et al. \cite{wang2019link} proposes a link prediction algorithm with an adjustable parameter based on community information (CI). They apply the proposed algorithm to nine similarity indices, and a family of CI-based indices. Their results show that CI forms have better overall prediction performance, compared to tradition local indices. They then develop a parallel algorithm to apply the proposed CI-based link prediction algorithm to large-scale complex networks using Spark GraphX. They test on graphs of size $78$ to $17M$ edges.
+Mohan et al. \cite{mohan2017scalable} propose a hybrid similarity measure for link prediction that used parallel label propagation for community detection, and a parallel community information-based Adamic-Adar measure for link prediction, using the Bulk Synchronous Parallel (BSP) programming model. They test on graphs of size $29k$ to $35M$ edges.
+%% ON APPROXIMATION
+Garcia-Gasulla and Cort{\'e}s \cite{garcia2014link} propose a local link prediction algorithm based on the existence of an underlying hierarchical model. They also discuss points of parallelization, approximation, data locality aspects of link prediction algorithms for efficient computation. They test on graph of size $346k$ to $167M$, but focus only predicting edges only between $200k$ vertices.
+
+
+%% ON SMALL (<1M)
+%% ON COMMON NEIGHBORS
+Guo et al. \cite{guo2019node} introduce Common Neighbour Tightness (CNT), an link prediction method that incorporates the aggregation degree of common neighbors by considering their proximity based on local information and neighborhood tightness. They test on graphs of size $914$ to $732k$ edges.
+Rafiee et al. \cite{rafiee2020cndp} introduce link prediction based on Common Neighbors Degree Penalization (CNDP), which considers clustering coefficient as a structural property and takes into account the neighbors of shared neighbors. They test on graphs of size $441$ to $42k$ edges.
+Mumin et al. \cite{mumin2022efficient} propose an algorithm that uses common neighbors in addition to the degree distribution of the nodes to estimate the possibility of the presence of a link between two nodes in a network based on local information. They experiment on small graph, with the number of edges ranging from $1.0k$ to $80k$, and show higher prediction accuracy compared with most of the local information based methods like the Common Neighbor and Preferential Attachment. Their approach is competitive with the quasi-local indicators such as LP and global indicators like Katz, with a lower computational complexity than the two.
+%% ON RANDOM WALK
+Papadimitriou et al. \cite{papadimitriou2012fast} propose a similarity-based link prediction algorithm by traversing all paths of limited length, based on small world hypothesis. They also present variants that apply to directed and signed graphs, and discuss a possible MapReduce implementation of their algorithm. They test on graph of size $3.7k$ edges to $132k$ edges.
+%% ON DIFFUSION
+Vega-Oliveros et al. \cite{vega2021link} explore using susceptible-infected-recovered and independent cascade diffusion models for link prediction. Their proposed progressive-diffusion (PD) method, based on nodes' propagation dynamics, offers a stochastic discrete-time rumor model. They test on graphs of size $11k$ to $239k$.
+% ON CONNECTED COMPONENTS
+Saifi et al. \cite{saifi2023fast} propose an approach that operates on the connected components of a network instead of the whole network, which speeds up link prediction using local and path-based similarity measures. They test on datasets of size $441$ to $88k$ edges.
+
+%% ON APPROXIMATION
+Ferreira et al. \cite{ferreira2019scalability} propose an approach based on the multilevel optimization paradigm to improve the scalability of any link prediction algorithm, by reducing the original network to a coarsened version. After applying the link prediction algorithm in the coarsened network, we show how to project the prediction results back to the original network. They test on graphs of size $2.7k$ to $121k$ edges.
+Benhidour et al. \cite{benhidour2022approach} propose a link prediction method for directed networks, leveraging the similarity-popularity paradigm. The algorithms approximate the hidden similarities as shortest path distances using edge weights that capture and factor out the links' asymmetry and nodes' popularity. They test on graphs of size $61$ to $120k$ edges.
+
+%% ON BIPARTITE
+Sarhangnia et al. \cite{sarhangnia2022novel} present a similarity measure of link prediction in bipartite social networks based on neighborhood structure. They test on graphs of size $81k$ to $267k$ edges.
+%% ON MULTIPLEX
+Sharma and Singh \cite{sharma2016efficient} propose an algorithm for weight prediction using Link similarity measures on multiplex networks. They test on graph of size $7.2k$ edges.
+
+
+%% ON LARGE
+%% ON COMMON NEIGHBORS
+Yang et al. \cite{yang2015new} propose a new measure motivated by the cohesion between common neighbors and the predicted nodes, called Local Neighbors Link (LNL), and implement them in both MapReduce and Spark. They test on graphs of size $2.1k$ edges to $1.5M$ edges.
+Cui et al. \cite{cui2016bounded} propose a parallel algorithm to efficiently evaluate the Common Neighbors (CN) similarity metric for link prediction by obtaining all node pairs with CN values larger than a lower bound. They test their approach on graphs of size $88k$ to $14M$ edges.
+%% ON RANDOM WALK
+Kalkan and Hambiralovic \cite{kalkanfinding} propose a Personalized PageRank based methods for link prediction. They test on graphs of size $2.1k$ to $1.5M$ edges.
+%% ON COMMUNITY
+Mohan et al. \cite{mohan2017scalable} propose a hybrid similarity measure for link prediction that used parallel label propagation for community detection, and a parallel community information-based Adamic-Adar measure for link prediction, using the Bulk Synchronous Parallel (BSP) programming model. They test on graphs of size $29k$ to $35M$ edges.
+Wang et al. \cite{wang2019link} proposes a link prediction algorithm with an adjustable parameter based on community information (CI). They apply the proposed algorithm to nine similarity indices, and a family of CI-based indices. Their results show that CI forms have better overall prediction performance, compared to tradition local indices. They then develop a parallel algorithm to apply the proposed CI-based link prediction algorithm to large-scale complex networks using Spark GraphX. They test on graphs of size $78$ to $17M$ edges.
+Bastami et al. \cite{bastami2019gravitation} present an unsupervised gravitation-based link prediction approach to accuracy improvement of local and global predictions by integrating node features, community information and graph properties to distribute and reduce of the prediction space. They test on graphs of size $1.6k$ to $100M$ edges.
+%% ON APPROXIMATION
+Shin at al. \cite{shin2012multi} introduce Multi-Scale Link Prediction (MSLP), which that utilizes a tree-structured approximation algorithm to handle link prediction in large networks through efficient construction of low-rank approximations at multiple scales. They test on graph of size $44M$ to $92M$ edges.
+Garcia-Gasulla and Cort{\'e}s \cite{garcia2014link} propose a local link prediction algorithm based on the existence of an underlying hierarchical model. They also discuss points of parallelization, approximation, data locality aspects of link prediction algorithms for efficient computation. They test on graph of size $346k$ to $167M$, but focus only predicting edges only between $200k$ vertices.
+%% ON BIPARTITE
+Aslan and Kaya \cite{aslan2018topic} propose a similarity-based link prediction method based on strengthening weighted projection to predict the potential links between the authors and the topics in the large-scale bipartite academic information network created from the real-world data. They test on graph of size of upto $1.3M$ edges.
+
+
+
+
+
+
+
+
+%% ---------------------------------------------------
+
+However, early studies often evaluate a limited number of algorithms on small networks --- this can result in misleading conclusions \cite{zhou2021progresses, zhou2021experimental}. Further, much existing research does not address link prediction for large networks with close to a billion edges \cite{muscoloni2022adaptive, mumin2022efficient, nasiri2021novel, xian2021towards, ghasemian2020stacking, mara2020benchmarking, wang2019link, xu2019distributed, mohan2017scalable, cui2016bounded, garcia2014link, papadimitriou2012fast}. As the collection of data, represented as graphs, reach unprecedented levels, it becomes necessary to design efficient parallel algorithms for link prediction on such graphs. While link prediction algorithms are often pleasingly parallel, most studies do not address the design of suitable data structures for efficient computation of scores.
+
+Further, the link prediction problem faces significant imbalance, with the number of known present links often several order of magnitude less than known absent links. This imbalance hinders the effectiveness of many link prediction methods, particularly on large networks \cite{wang2014link, garcia2014link}. Thus, heuristics are needed to minimize the computation needed, without sacrificing on quality.\ignore{To assess the accuracy of link prediction algorithms, observed links $E$ are split into a training set $E^T$ and a probe set $E^P$ for evaluation.} Quality assessment measures for link prediction include precision, recall, F1 score, accuracy, and Area Under the Receiver Curve (AUC). While AUC is commonly used \cite{arrar2023comprehensive}, it may provide misleading results\ignore{, by giving high scores to algorithms that successfully rank many negatives in the bottom} \cite{yang2015evaluating, lichtnwalter2012link}, leading to our focus on F1 score.
+
+%% ---------------------------------------------------
+
+In social network analysis, the similarity measure based on the number of common neighbors, a local similarity measure, is often used as a first-order heuristic function to predict potential friendship relations. It has been shown to achieve satisfactory performance \cite{arrar2023comprehensive}. However, this heuristic may not be effective when it is applied to protein–protein interaction networks. In these types of networks, two proteins sharing many common neighbors may still have a low probability of interacting, making this heuristic a non-reliable predictor in this context \cite{arrar2023comprehensive}. Extensive experiments \cite{ghasemian2020stacking} show that no known link predictor performs best or worst across all inputs \cite{zhou2021progresses}.
+
+Link prediction problem always suffers from extreme imbalance, namely, the number of links known to be present is often much less than the number of links known to be absent. This imbalance hampers the effectiveness of many link prediction methods \cite{wang2014link}.
+The smallest graph we use has 89,000 nodes and the largest 17 million. Their ratio of positive:negative edges goes from 1:11,000 in the best case (Wordnet) to 1:27 million in the worst case (Wikipedia). This huge imbalance makes LP a needle in a haystack problem, where we are trying to find a tiny set of correct edges within a huge set of incorrect ones \cite{garcia2014link}.
+
+Link prediction for deleting/disappearing links can be solved analogously \cite{wang2014link}.
+
+
+
 %% How is link prediction computed?
 %% What is local/neighborhood-based link prediction?
 %% What are similarity measures? Why are they used with link prediction?
@@ -7,15 +124,6 @@
 %% Why are existing approaches bad?
 %% Why are solving these important?
 %% Why is parallelization/shared-memory setting important?
-
-
-Link prediction in network analysis involves diverse algorithms, with neighborhood-based and machine learning-based methods being prominent.
-
-Heterogeneous networks with different types of nodes and links require different approaches to those used in homogeneous networks \cite{sun2012will}.
-
-Low-Rank Approximation: This method simplifies the structure of the network to reduce its noise using the adjacency matrix A representation of the graph by solving the low-rank approximation problem \cite{kunegis2009learning}. Unfortunately, this technique is not practical for large matrices due to lack of numerical accuracy \cite{martinez2016survey}.
-
-The authors report the complexity of various algorithms in terms of the number of nodes $n$, and the maximum degree of a vertex $k$ \cite{martinez2016survey}.
 
 
 
@@ -32,10 +140,7 @@ Link prediction algorithms have been used in evaluating and inferring network ev
 
 %% Could be in related work as well.
 Ghasemian et al. \cite{ghasemian2020stacking} argues that the ensemble models are usually superior to individual algorithms.
-An individual algorithm could be highly cost-effective for its competitive performance and low complexity in time and space \cite{zhou2021progresses}.
-In some real applications like friend recommendation, predictions with explanations are more acceptable \cite{barbieri2014follow}, which cannot be obtained by ensemble learning.
 
-A network embedding algorithm will produce a function so that every node is represented by a low-dimensional vector \cite{cui2018survey}. Then, the existence likelihood of a non-observed link can be estimated by the inner product, the cosine similarity, the Euclidean distance, or the geometrical shortest path of the two learned vectors \cite{cui2018survey, cannistraci2013minimum}.
 On the one hand, embedding is currently a very hot topic in network science and thought to be a promising method for link prediction. On the other hand, some very recent empirical studies \cite{muscoloni2022adaptive, mara2020benchmarking, ghasemian2020stacking} involving more than a thousand networks showed negative evidence that network embedding algorithms perform worse than some elaborately designed mechanistic algorithms.
 Another notable embedding method is based on the hyperbolic network model \cite{krioukov2010hyperbolic, papadopoulos2012popularity}, where each node is represented by only two coordinates (i.e., d = 2) in a hyperbolic disk.
 
