@@ -108,56 +108,45 @@ Note that the CN, AA, and RA metrics lack normalization, and thus only convey ra
 
 \subsection{Measuring Prediction Quality}
 
-There are a number of metrics used to evaluate the performance of a link prediction model \cite{arrar2023comprehensive}. Performance evaluation metrics can be roughly divided into two categories: threshold-dependent, and threshold-independent metrics \cite{zhou2021progresses}. Precision and recall are the two most widely used metrics in the former category, while Area Under the ROC Curve (AUC), where ROC stands for Receiver operating characteristic, is the most widely used in the later category. To test the algorithm’s accuracy, the observed link, $E$, is divided into two parts: the training set $E^T$ is treated as known information, while the probe set $E^P$ is used for algorithm evaluation, and no information in $E^P$ is allowed to be used for prediction. The majority of known studies applied ‘‘random division’’, namely $E^P$ is randomly drawn from $E$ \cite{zhou2021progresses}.
-
-\ignore{Current link prediction experimental results are usually very low in evaluation metrics values \cite{wang2014link}.}
+A number of measures are used to assess link prediction performance. These include precision, recall, F1 score, and Area Under the Receiver Curve (AUC) \cite{arrar2023comprehensive}. However, AUC is insufficient for early quality assessment, as it may inaccurately favor algorithms ranking many negatives at the bottom \cite{zhou2021progresses, yang2015evaluating, lichtnwalter2012link}. Accordingly, we focus on precision, recall, and F1 score in this report.
 
 
 \subsubsection{Precision}
 
-Precision is a metric used to evaluate the performance of a link prediction model. It measures the proportion of correctly classified positive links (i.e. links that actually exist) among all classified positive links \cite{arrar2023comprehensive}.
-
-Precision is defined as the ratio of relevant items selected to the number of items selected \cite{zhou2021progresses}, i.e., it measures the proportion of correctly classified positive links (i.e. links that actually exist) among all classified positive links \cite{arrar2023comprehensive}. In other words, if we take the top-$L$ links as the predicted ones; among which $L_r$ links are correctly predicted; then, the Precision equals $L_r/L$ \cite{zhou2021progresses}. Equation \ref{eq:precision} gives the formula for computing precision.
+Precision measures the ratio of correctly predicted links $P^\checkmark$ to all predicted links $P = P^\checkmark \cup P^\times$, where $P^\times$ is the set of incorrectly predicted links \cite{arrar2023comprehensive, zhou2021progresses}. Equation \ref{eq:precision} provides the formula for precision computation.
 
 \begin{equation}
 \label{eq:precision}
-  \text{Precision} = \frac{TP}{TP + FP}
+  \text{Precision} = \frac{|P^\checkmark|}{|P|}
 \end{equation}
 
 
 \subsubsection{Recall}
 
-Recall is defined as the ratio of relevant items selected to the total number of relevant items (say $L_r = |E^P|$) \cite{zhou2021progresses}, or the ratio of correctly classified positive links to the total number of positive links \cite{arrar2023comprehensive}. The formula for calculating recall in given in Equation \ref{eq:recall}. A widely adopted way is setting $L = |E^P|$, at which precision = recall \cite{lu2011link, liben2003link, zhou2021progresses}. Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
+Unlike precision, recall measures the ratio of correctly predicted links $P^\checkmark$ to the new ground-truth links $E^U$, as presented in Equation \ref{eq:recall} \cite{arrar2023comprehensive, zhou2021progresses}. If the number of predicted links is equal to the number of new ground-truth links, then recall is the same as precision \cite{zhou2021progresses, lu2011link, liben2003link}.
 
 \begin{equation}
 \label{eq:recall}
-  \text{Recall} = \frac{TP}{TP + FN}
+  \text{Recall} = \frac{|P^\checkmark|}{|E^U|}
 \end{equation}
 
 
 \subsubsection{F1 Score}
 
-F1 Score is a measure of the balance between precision and recall \cite{arrar2023comprehensive}. It can calculated as the harmonic mean of percision and recall, as shown in Equation \ref{eq:f1score}.
+F1 score is a measure of the balance between precision and recall \cite{arrar2023comprehensive}. It is calculated as the harmonic mean of precision and recall, as shown in Equation \ref{eq:f1score}.
 
 \begin{equation}
 \label{eq:f1score}
   \text{F1 score} = 2 * \frac{\text{Precision} * \text{Recall}}{\text{Precision} + \text{Recall}}
 \end{equation}
 
-
-\subsubsection{Accuracy}
-
-Accuracy is a metric that indicates the percentage of correctly classified links by a link prediction model \cite{arrar2023comprehensive}. It can be calculated using Equation \ref{eq:accuracy}.
-
-\begin{equation}
-\label{eq:accuracy}
-  \text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-\end{equation}
+A majority of link prediction studies apply random division of the ground-truth edges $E$, into sets of observed $E^O$ and unobserved edges $E^U$ to assess link prediction performance \cite{zhou2021progresses}. The number of unobserved edges $|E^U|$ is commonly set at $10\%$ of total links in $E$, based on empirical findings that it yields statistically solid results without significantly altering the network's structure \cite{lu2015toward}.
 
 
-\subsubsection{Area Under the ROC Curve (AUC)}
-
-Area Under the Receiver (AUC) \cite{hanley1982meaning} is the area under the receiver operating characteristic curve (ROC) is a measure of the prediction algorithm's ability to distinguish between positive and negative links \cite{arrar2023comprehensive}. A higher AUC value indicates a more efficient algorithm compared to random choice \cite{mumin2022efficient}. However, AUC is inadequate to evaluate the early retrieval performance which is critical in real applications \cite{zhou2021progresses}. AUC will give misleadingly overhigh score to algorithms that can successfully rank many negatives in the bottom while this ability is less significant in imbalanced learning \cite{yang2015evaluating, lichtnwalter2012link}.
 
 
-\ignore{How do you explore the neighbors of each node, and compute intersection? What is a super naive way to do the above?}
+\subsection{Baseline Approach for Neighborhood-based Link Prediction}
+
+A baseline approach for neighborhood-based link prediction involves computing similarity scores between all non-connected node pairs $\{(i, j)\ |\ i, j \in V; (i, j) \notin E\}$, and returning the node pairs with top-$k$ scores as the predicted links. The similarity score is computed by assessing the commonality of neighbors between the two nodes. This approach is used by an number of studies previously mentioned \cite{gatadi2023lpcd, saifi2023fast, benhidour2022approach, mumin2022efficient, rafiee2020cndp, guo2019node, yang2015new, papadimitriou2012fast, wang2019link}. Notably, popular network analysis software packages such as NetworKit \cite{staudt2016networkit} and igraph \cite{csardi2006igraph} also implement this baseline approach.
+
+While this approach is simple to understand, it has severe computational costs. Finding the common neighbors $\Gamma_i \cap \Gamma_j$ of node pairs $(i, j)$ using a naive method has a time complexity of $O(D^2)$, where $D$ is the degree of the maximum degree node in the graph. This results in an overall time complexity of $O(N^2D^2)$. Using a hashtable, one can only reduce the time complexity to $O(N^2D)$. Additionally, this method involves significant unnecessary computations, as many node pairs are likely to lack common neighbors.

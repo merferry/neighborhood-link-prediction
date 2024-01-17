@@ -19,6 +19,9 @@ The graphs used in our experiments are given in Table \ref{tab:dataset}. These a
 \subsubsection{Observed Graph generation}
 
 To generate the observed graphs, we take each graph from the dataset and randomly remove $10^-4|E|$ to $0.1|E|$ edges from it --- where the endpoints of removed edges are chosen with uniformly probability.\ignore{For each batch size, we generate five random batch updates for averaging.}
+The evaluation involves splitting ground-truth links ($E$) into observed ($E^O$) and unobserved ($E^U$) sets, using $E^O$ for known information and $E^U$ for algorithm evaluation \cite{arrar2023comprehensive}.
+The majority of known studies apply ‘‘random division’’, namely $E^P$ is randomly drawn from $E$ \cite{zhou2021progresses}.
+Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
 
 \ignore{Are there no missing links in the original graphs?}
 
