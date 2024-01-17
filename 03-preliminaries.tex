@@ -1,114 +1,107 @@
-Consider a undirected graph $G(V, E)$, where $V$ and $E$ are the sets of vertices and edges respectively. For the sake of simplicity, we ignore directedness or weights of edges, and disallow self-loops or multiple edges between vertices. Let $U$ be the universal set containing all $|V|(|V|-1)/2$ possible edges in the graph. Thus, $U - E$ is the set of unobserved edges. Assuming that there are some missing or future edges in the set of unobserved edges $U - E$, the task of link prediction is to\ignore{probabilistically} find out those missing or future links \cite{zhou2021progresses}. Note that the ratio of positive to negative edges is huge. Garcia et. al \cite{garcia2014link} observe that this ratio goes from $1 : 11k$ in their best case to $1 : 27M$ in the worst case. This huge imbalance makes link prediction a needle in a haystack problem, where we are trying to find a tiny set of correct edges within a huge set of incorrect ones \cite{garcia2014link, wang2014link}. Further, the size of graphs originated from the web, social networks or biological relations forces us to use simple algorithms if those graphs are to be computed in acceptable time \cite{garcia2014link}.
+In an undirected graph $G(V, E)$ with sets of vertices $V$ and edges $E$, link prediction aims to identify missing or future edges from the set $U - E$, where $U$ contains all possible $|V|(|V|-1)/2$ edges in the graph \cite{zhou2021progresses}. Link prediction, thus, is akin to finding a needle in a haystack, as the correct edges need to be identified within a vast set of incorrect ones \cite{garcia2014link, wang2014link}. Garcia et. al \cite{garcia2014link} observe that this ratio goes from $1:11k$ in their best case to $1:27M$ in the worst case. Further, larger graphs more likely to be incomplete. These challenges make the study of link prediction crucial.
 
-Usually, the possibilities of such missing/future links can be measured by similarities metrics between node pairs \cite{wang2014link, arrar2023comprehensive}. Computing the similarity between a node pair is an intuitive solution for link prediction. It is based on the simple idea: the more similar the pair is, the more likely a link between them, and vice versa. This is consistent with the fact that users tend to create relationships with people who are similar in education, religions, interests and locations. It can be measured by the similarity, in which each potential node pair (x, y) is assigned a score signifying similarity between x and y. A high score indicates high probability that x and y will be linked in the future, while a low score also indicates high probability that x and y will not be linked. A ranked list in decreasing order of scores can then be obtained, and links at the top of the list are most likely to appear \cite{wang2014link}. Therefore, using the rank of similarity scores, we can predict missing/future links in graphs \cite{wang2014link}. The most similarity measures between nodes, used in link prediction studies, are local, quasi-local, and global indices \cite{arrar2023comprehensive}. Link prediction for deleting/disappearing links can be solved analogously \cite{almansoori2012link}.
+Link prediction often relies on similarity metrics between node pairs, reflecting the likelihood of missing or future links \cite{wang2014link, arrar2023comprehensive}. The idea is grounded in the tendency for users to connect with similar individuals. More similarity thus suggests a higher probability of a future link. A ranked list of potential links based on similarity scores can then be used to predict the top-$k$ links are most likely to appear (on were missing) \cite{wang2014link}. Similarity measures are commonly categorized into local, quasi-local, and global measures. Local / neighborhood-based metrics, like Common Neighbours (CN), are calculated based on neighborhood information within a path distance of two. Global indices use network-wide information, while quasi-local indices combine both for distances up to two \cite{arrar2023comprehensive}.
 
+As brought up earlier, despite typically having lower prediction accuracy than machine learning based approaches, similarity-based link prediction methods remain relevant due to the need for simple algorithms in handling large graphs \cite{garcia2014link}. Further, they are highly cost-effective, interpretable, and offer competitive prediction quality with low time and space complexity \cite{zhou2021progresses, barbieri2014follow}.
 
-\ignore{What is the link prediction problem? Why is it similar to a compression/GAN problem? Understand the given network, and predict the missing links. Why it can never be 100\% precise, but precise enough?}
-
-\ignore{How do you explore the neighbors of each node, and compute intersection? What is a super naive way to do the above?}
 
 
 
 \subsection{Neighborhood-based Similarity Metrics}
 
-The most similarity measures between nodes, used in link prediction studies, are local, quasi-local, and global indices \cite{arrar2023comprehensive}. Local / neighborhood-based similarity metrices, such as Common Neighbours \cite{newman2001clustering}, Salton Index \cite{salton1973specification}, Jaccard Index \cite{jaccard1901etude}, Sorensen Index \cite{sorensen1948method}, Hub Promoted Index \cite{liben2003link}, Preferential Attachment Index \cite{barabasi1999emergence}, Adamic–Adar Index \cite{adamic2003friends}, and Resource Allocation Index \cite{zhou2010solving} are used to calculate scores based on the neighborhood information of nodes with a path distance less than two \cite{arrar2023comprehensive}. On the other hand, global indices use information from the entire network to calculate scores with a path distance greater than two \cite{arrar2023comprehensive}, while quasi-local indices combine local and global indices and calculate scores for nodes with a path distance of no more than two \cite{arrar2023comprehensive}. In social network analysis, the similarity measure based on the number of common neighbors is often used as a first-order heuristic function to predict potential friendship relations \cite{arrar2023comprehensive}. Optimizating computation of local similarity metrices are thus important. Further, extensive experiments \cite{ghasemian2020stacking} show that no known link predictor performs best or worst across all inputs \cite{zhou2021progresses}. Thus, we discuss many metrices here.
-
-\ignore{However, this heuristic may not be effective when it is applied to protein–protein interaction networks. In these types of networks, two proteins sharing many common neighbors may still have a low probability of interacting, making this heuristic a non-reliable predictor in this context \cite{arrar2023comprehensive}.}
-
-
+We now discuss nine commonly used local / neighborhood-based similarity metrics for link prediction.
 
 
 \subsubsection{Common Neighbors (CN)}
 
-The Common Neighbors (CN) metric measures the number of common neighbors between two vertices $i$ and $j$ in a graph, as shown in Equation \ref{eq:cn}. It is a widely used similarity measure, mainly due to its simplicity \cite{newman2001clustering}. As it is not normalized, it might be problematic when comparing node pairs with varying degrees of connectivity.
+This metric, shown in Equation \ref{eq:cn}, counts the shared neighbors between two vertices, $a$ and $b$, in a graph \cite{newman2001clustering}. However, its lack of normalization may pose challenges when comparing node pairs with different degrees of connectivity.
 
 \begin{equation}
 \label{eq:cn}
-  CN(i, j) = |\Gamma_i \cap \Gamma_j|
+  CN(a, b) = |\Gamma_a \cap \Gamma_b|
 \end{equation}
 
 
 \subsubsection{Jaccard Coefficient (JC)}
 
-The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a similarity measure commonly used in network analysis and link prediction. It provides a normalized assessment of the similarity between two nodes in a graph, in terms of their neighborhoods. JC is defined such that it assigns higher values to pairs of nodes that share a greater proportion of common neighbors relative to their total number of neighbors, as given in Equation \ref{eq:jc}.
+The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a popular similarity measure\ignore{in network analysis and link prediction}. It offers a normalized assessment of similarity between nodes based on their neighborhoods. Defined by Equation \ref{eq:jc}, JC assigns higher values to node pairs with a greater proportion of common neighbors relative to their total neighbors.
 
 \begin{equation}
 \label{eq:jc}
-  JC(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i \cup \Gamma_j|}
+  JC(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a \cup \Gamma_b|}
 \end{equation}
 
 
 \subsubsection{S{\o}rensen Index (SI)}
 
-The S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as the S{\o}rensen–Dice coefficient, is another similarity metric commonly applied in network analysis and link prediction. This metric, defined by Equation \ref{eq:si}, extends beyond solely accounting for the size of common neighbors and introduces the idea that nodes with lower degrees are more likely to form links.
+S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as S{\o}rensen–Dice coefficient, is another similarity metric commonly applied in network analysis and link prediction. This metric, defined by Equation \ref{eq:si}, extends beyond solely accounting for the size of common neighbors and introduces the idea that nodes with lower degrees are more likely to form links.
 
 \begin{equation}
 \label{eq:si}
-  SI(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i| + |\Gamma_j|}
+  SI(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a| + |\Gamma_b|}
 \end{equation}
 
 
 \subsubsection{Salton Cosine similarity (SC)}
 
-The Salton Cosine similarity (SC) \cite{salton1973specification} is a frequently used cosine metric in the context of measuring similarity between two nodes in a graph. It essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $i$ and $j$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
+The Salton Cosine similarity (SC) \cite{salton1973specification} essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $a$ and $b$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
 
 \begin{equation}
 \label{eq:sc}
-  SC(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{\sqrt{|\Gamma_i| \cdot |\Gamma_j|}}
+  SC(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{\sqrt{|\Gamma_a| \cdot |\Gamma_b|}}
 \end{equation}
 
 
 \subsubsection{Hub Promoted (HP)}
 
-The Hub Promoted (HP) score \cite{liben2003link} is a metric that assesses the topological overlap between two nodes, denoted as $i$ and $j$, in a graph. It is defined by the formula given in Equation \ref{eq:hp}. The HP score is particularly influenced by the lower degree of nodes, and can be valuable in scenarios where the involvement of lower-degree nodes is considered important in understanding network connectivity.
+The HP \cite{liben2003link} metric, defined by Equation \ref{eq:hp}, assesses topological overlap between two nodes in a graph. It is particularly influenced by the lower degree of nodes, and can be valuable in scenarios where the involvement of lower-degree nodes is considered important in understanding network connectivity.
 
 \begin{equation}
 \label{eq:hp}
-  HP(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{min(|\Gamma_i|, |\Gamma_j|)}
+  HP(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{min(|\Gamma_a|, |\Gamma_b|)}
 \end{equation}
 
 
 \subsubsection{Hub Depressed (HD)}
 
-In contrast to the HP score, the Hub Depressed (HD) score \cite{zhou2009predicting} is determined by the higher degrees of nodes. It can be particularly useful in cases where the influence of highly connected nodes on network structure is of interest. The HD score between two nodes $i$ and $j$ in the graph is defined as per Equation \ref{eq:hd}.
+In contrast to the HP metric, the Hub Depressed (HD) score \cite{zhou2009predicting} is determined by the higher degrees of nodes, as illustrated by Equation \ref{eq:hd}. It can be particularly useful in cases where the influence of highly connected nodes on network structure is of interest.
 
 \begin{equation}
 \label{eq:hd}
-  HD(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{max(|\Gamma_i|, |\Gamma_j|)}
+  HD(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{max(|\Gamma_a|, |\Gamma_b|)}
 \end{equation}
 
 
 \subsubsection{Leicht-Holme-Nerman (LHN)}
 
-The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metric that assigns high similarity to node pairs that exhibit a greater number of common neighbors than would be expected by random chance. One may use Equation \ref{eq:lhn} to compute the LHN score between two nodes $i$ and $j$ in a graph.
+The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metric that assigns high similarity to node pairs that exhibit a greater number of common neighbors than would be expected by random chance. One may use Equation \ref{eq:lhn} to compute the LHN score between two nodes $a$ and $b$ in a graph.
 
 \begin{equation}
 \label{eq:lhn}
-  LHN(i, j) = \frac{|\Gamma_i \cap \Gamma_j|}{|\Gamma_i| \cdot |\Gamma_j|}
+  LHN(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a| \cdot |\Gamma_b|}
 \end{equation}
 
 
 \subsubsection{Adamic-Adar coefficient (AA)}
 
-The Adamic-Adar coefficient (AA) \cite{adamic2003friends} is a measure designed to capture the notion that connections to common neighbors with fewer links are more informative and indicative of similarity between nodes in a network. The formula for this metric is given by Equation \ref{eq:aa}, where $\Gamma_i$ and $\Gamma_j$ represent the neighbors of node $i$ and $j$. The weight assigned to each common neighbor is inversely proportional to the logarithm of the number of neighbors that neighbor has. This logarithmic weighting downplays the influence of common neighbors with very high degrees, making the metric less sensitive to connections with nodes that are overly connected in the network. The AA metric metric thus captures the idea that connections to less common neighbors provide more discriminative information about the similarity between nodes.
+AA \cite{adamic2003friends} is a popular measure designed to capture the notion that connections to common neighbors with fewer links are more informative and indicative of similarity between nodes in a network. The formula in Equation \ref{eq:aa} assigns weights inversely proportional to the logarithm of the number of neighbors, reducing sensitivity to highly connected nodes.\ignore{AA highlights that links to less common neighbors provide more discriminative information about node similarity.}
 
 \begin{equation}
 \label{eq:aa}
-  AA(i, j) = \sum_{k\ \in\ \Gamma_i \cup \Gamma_j} \frac{1}{\log{|\Gamma_k|}}
+  AA(a, b) = \sum_{c\ \in\ \Gamma_a \cup \Gamma_b} \frac{1}{\log{|\Gamma_c|}}
 \end{equation}
 
 
 \subsubsection{Resource Allocation (RA)}
 
-The Resource Allocation (RA) \cite{zhou2010solving} metric was originally motivated by the concept of resource allocation, or heat diffusion, across a user-object network. It reflects the intuition that heavily connected nodes may already have abundant connections and may not play as critical a role in facilitating resource flow between two other nodes. Unlike AA, high-degree common neighbors are penalized more heavily in the RA metric. The formula for RA score between two nodes $i$ and $j$ is given by Equation \ref{eq:ra}.
+The RA metric \cite{zhou2010solving} is based on the concept of heat diffusion in a network, emphasizing that heavily connected nodes may not play a critical role in facilitating resource flow between other nodes. Unlike AA, RA penalizes high-degree common neighbors more heavily. The score between nodes $a$ and $b$ is determined by Equation \ref{eq:ra}.
 
 \begin{equation}
 \label{eq:ra}
-  RA(i, j) = \sum_{k\ \in\ \Gamma_i \cup \Gamma_j} \frac{1}{|\Gamma_k|}
+  RA(a, b) = \sum_{c\ \in\ \Gamma_a \cup \Gamma_b} \frac{1}{|\Gamma_c|}
 \end{equation}
 
-Note that the CN, AA, and RA similarity metrics are not normalized. This mean that similarities under these metrics only have the ranking meanings \cite{wang2014link}. Finally, we should draw attention to the fact that, although there are many existing neighbor-based metrics, in practical applications, one should choose the right metrics according to the characteristics of social networks, because many experiment evaluation results have shown that there is no absolutely dominating metric for different datasets \cite{liben2003link, wang2014link, zhou2021progresses}.
-%% NOTE; What is the complexity of each similarity metric. Mention at the end of all in preliminaries.
+Note that the CN, AA, and RA metrics lack normalization, and thus only convey ranking information \cite{wang2014link}. In practical applications, one should choose the right metric based on the network's characteristics --- there is no universally dominating metric \cite{zhou2021progresses, ghasemian2020stacking, wang2014link, liben2003link}.
 
 
 
@@ -165,3 +158,6 @@ Accuracy is a metric that indicates the percentage of correctly classified links
 \subsubsection{Area Under the ROC Curve (AUC)}
 
 Area Under the Receiver (AUC) \cite{hanley1982meaning} is the area under the receiver operating characteristic curve (ROC) is a measure of the prediction algorithm's ability to distinguish between positive and negative links \cite{arrar2023comprehensive}. A higher AUC value indicates a more efficient algorithm compared to random choice \cite{mumin2022efficient}. However, AUC is inadequate to evaluate the early retrieval performance which is critical in real applications \cite{zhou2021progresses}. AUC will give misleadingly overhigh score to algorithms that can successfully rank many negatives in the bottom while this ability is less significant in imbalanced learning \cite{yang2015evaluating, lichtnwalter2012link}.
+
+
+\ignore{How do you explore the neighbors of each node, and compute intersection? What is a super naive way to do the above?}
