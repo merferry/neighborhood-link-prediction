@@ -24,6 +24,10 @@ The majority of known studies apply ‘‘random division’’, namely $E^P$ is
 Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
 
 \ignore{Are there no missing links in the original graphs?}
+\ignore{Runtime + speedup + precision for $0.1|E|$.
+Lu et al. \cite{lu2015toward} use precision.}
+\ignore{What is the expected precision of random guess?}
+\ignore{Why the choice of best method appears to change with batch size?}
 
 \input{src/tab-dataset}
 
@@ -59,6 +63,14 @@ Lu et al. \cite{lu2015toward} use precision.}
 \ignore{Are there no missing links in the original graphs?}
 \ignore{Arent graphs heterogeneous? Why one method works?}
 \ignore{Why do these methods perform well?}
+
+
+\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
+\ignore{Explain the confusion y-axis on precision.}
+\ignore{On a set of smaller graphs, we observe/identify the most precise approaches, and observe the X, X, and X to perform the best. Accordingly, we run these methods on the graphs in our dataset.}
+\ignore{Comparison with baseline approach ($\infty$), i.e., exploring all possible/reachable pairs at distance 2, and quickly computing intersection, scores, adding to heap, and merging across threads. Explain with figure in approach.}
+\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
+
 
 \ignore{Can you show details plots? No.}
 

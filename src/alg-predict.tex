@@ -4,10 +4,10 @@
 \begin{algorithmic}[1]
 \Require{$G(V, E)$: Input graph}
 \Require{$N_P$: Maximum number of edges to predict}
-\Require{$S_{min}$: Minimum score above which to predict}
-\Ensure{$i, j, k$: Current vertex, first order, second order neighbor}
-\Ensure{$\Pi_j$: Maximum allowed degree of first order neighbor $j$}
-\Ensure{$D_j$: Degree of first order neighbor $j$}
+\Require{$S_{th}$: Threshold score above which to predict}
+\Ensure{$a, b, c$: Current vertex, first order, second order neighbor}
+\Ensure{$L_H$: Hub limit, i.e., large hub degree threshold}
+\Ensure{$|\Gamma_b|$: Degree of first order neighbor $b$}
 \Ensure{$H_t$: Collision-free per-thread hashtable}
 \Ensure{$P_t$: Per-thread prediction list}
 \Ensure{$P_h$: Heap for merging per-thread prediction lists}
@@ -15,33 +15,33 @@
 
 \Statex
 
-\Function{predictLinks}{$G, N_P, S_{min}$} \label{alg:predict--begin}
+\Function{predictLinks}{$G, N_P, S_{th}$} \label{alg:predict--begin}
   \State $\rhd$ Scoring phase
   \State $P_t \gets \{\}$ \textbf{on each thread} \label{alg:predict--scoring-begin}
-  \ForAll{$i \in V$ \textbf{in parallel}}
-    \State $\rhd$ Scan second order neighbors of $i$
+  \ForAll{$a \in V$ \textbf{in parallel}}
+    \State $\rhd$ Scan second order neighbors of $a$
     \State $H_t \gets \{\}$
-    \ForAll{$j \in G.out(i)$}
+    \ForAll{$b \in G.out(a)$}
       \State $\rhd$ Skip high degree first order neighbors
-      \If{$D_j \leq \Pi_j$} $scanEdges(H_t, G, j)$
+      \If{$|\Gamma_b| \leq L_H$} $scanEdges(H_t, G, b)$
       \EndIf
     \EndFor
     \State $\rhd$ Avoid first order neighbors
-    \ForAll{$j \in G.out(i)$} $H_t[j] \gets 0$ \label{alg:predict--avoid-neighbors1}
+    \ForAll{$b \in G.out(a)$} $H_t[b] \gets 0$ \label{alg:predict--avoid-neighbors1}
     \EndFor
     \State $\rhd$ Get prediction scores and add to list
-    \ForAll{$k \in H_t.keys()$}
-      \State $score \gets computeScore(i, k, H_t[k])$
-      \If{$score \leq S_{min}$} \textbf{continue}
+    \ForAll{$c \in H_t.keys()$}
+      \State $score \gets computeScore(a, c, H_t[c])$
+      \If{$score \leq S_{th}$} \textbf{continue}
       \EndIf
-      \State $\rhd$ Add edge $(i, k)$ to prediction list
+      \State $\rhd$ Add edge $(a, c)$ to prediction list
       \If{$|P_t| < N_P$}
-        \State $P_t.push(\{i, k, score\})$
+        \State $P_t.push(\{a, c, score\})$
         \If{$|P_t| = N_P$} $P_t.makeMinHeapByScore()$
         \EndIf
       \ElsIf{$score \geq P_t[0].score$}
         \State $P_t.popHeap()$
-        \State $P_t.pushHeap(\{i, k, score\})$
+        \State $P_t.pushHeap(\{a, c, score\})$
       \EndIf
     \EndFor
   \EndFor \label{alg:predict--scoring-end}
@@ -65,14 +65,14 @@
 
 \Statex
 
-\Function{scanEdges}{$H_t, G, i, j$} \label{alg:predict--scan-begin}
-  \ForAll{$k \in G.out(j)$}
+\Function{scanEdges}{$H_t, G, a, b$} \label{alg:predict--scan-begin}
+  \ForAll{$c \in G.out(b)$}
     \State $\rhd$ Skip reverse edges
-    \If{$k \leq i$} \textbf{continue}
+    \If{$c \leq a$} \textbf{continue}
     \EndIf
-    \If{$metric = AA$} $H_t[k] \gets H_t[k] + 1 / log(D_j)$
-    \ElsIf{$metric = RA$} $H_t[k] \gets H_t[k] + 1 / D_j$
-    \Else\ $H_t[k] \gets H_t[k] + 1$
+    \If{$metric = AA$} $H_t[c] \gets H_t[c] + 1 / log(|\Gamma_b|)$
+    \ElsIf{$metric = RA$} $H_t[c] \gets H_t[c] + 1 / |\Gamma_b|$
+    \Else\ $H_t[c] \gets H_t[c] + 1$
     \EndIf
   \EndFor
 \EndFunction \label{alg:predict--scan-end}

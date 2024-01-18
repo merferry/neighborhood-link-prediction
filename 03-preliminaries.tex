@@ -8,17 +8,18 @@ As brought up earlier, despite typically having lower prediction accuracy than m
 
 
 \subsection{Neighborhood-based Similarity Metrics}
+\label{sec:metrics}
 
 We now discuss nine commonly used local / neighborhood-based similarity metrics for link prediction.
 
 
 \subsubsection{Common Neighbors (CN)}
 
-This metric, shown in Equation \ref{eq:cn}, counts the shared neighbors between two vertices, $a$ and $b$, in a graph \cite{newman2001clustering}. However, its lack of normalization may pose challenges when comparing node pairs with different degrees of connectivity.
+This metric, shown in Equation \ref{eq:cn}, counts the shared neighbors between two vertices, $a$ and $c$, in a graph \cite{newman2001clustering}. However, its lack of normalization may pose challenges when comparing node pairs with different degrees of connectivity.
 
 \begin{equation}
 \label{eq:cn}
-  CN(a, b) = |\Gamma_a \cap \Gamma_b|
+  CN(a, c) = |\Gamma_a \cap \Gamma_c|
 \end{equation}
 
 
@@ -28,7 +29,7 @@ The Jaccard Coefficient (JC) \cite{jaccard1901etude} is a popular similarity mea
 
 \begin{equation}
 \label{eq:jc}
-  JC(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a \cup \Gamma_b|}
+  JC(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{|\Gamma_a \cup \Gamma_c|}
 \end{equation}
 
 
@@ -38,17 +39,17 @@ S{\o}rensen Index (SI) \cite{sorensen1948method}, also known as S{\o}rensen–Di
 
 \begin{equation}
 \label{eq:si}
-  SI(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a| + |\Gamma_b|}
+  SI(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{|\Gamma_a| + |\Gamma_c|}
 \end{equation}
 
 
 \subsubsection{Salton Cosine similarity (SC)}
 
-The Salton Cosine similarity (SC) \cite{salton1973specification} essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $a$ and $b$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
+The Salton Cosine similarity (SC) \cite{salton1973specification} essentially measures the cosine of the angle between the vectors representing the neighborhoods of nodes $a$ and $c$, as given in Equation \ref{eq:sc}. Similar to other metrics, a higher SC value indicates a greater similarity in the neighborhood structures of the nodes, implying a higher likelihood of a link between them.
 
 \begin{equation}
 \label{eq:sc}
-  SC(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{\sqrt{|\Gamma_a| \cdot |\Gamma_b|}}
+  SC(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{\sqrt{|\Gamma_a| \cdot |\Gamma_c|}}
 \end{equation}
 
 
@@ -58,7 +59,7 @@ The HP \cite{liben2003link} metric, defined by Equation \ref{eq:hp}, assesses to
 
 \begin{equation}
 \label{eq:hp}
-  HP(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{min(|\Gamma_a|, |\Gamma_b|)}
+  HP(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{min(|\Gamma_a|, |\Gamma_c|)}
 \end{equation}
 
 
@@ -68,7 +69,7 @@ In contrast to the HP metric, the Hub Depressed (HD) score \cite{zhou2009predict
 
 \begin{equation}
 \label{eq:hd}
-  HD(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{max(|\Gamma_a|, |\Gamma_b|)}
+  HD(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{max(|\Gamma_a|, |\Gamma_c|)}
 \end{equation}
 
 
@@ -78,7 +79,7 @@ The Leicht-Holme-Nerman (LHN) score \cite{leicht2006vertex} is a similarity metr
 
 \begin{equation}
 \label{eq:lhn}
-  LHN(a, b) = \frac{|\Gamma_a \cap \Gamma_b|}{|\Gamma_a| \cdot |\Gamma_b|}
+  LHN(a, c) = \frac{|\Gamma_a \cap \Gamma_c|}{|\Gamma_a| \cdot |\Gamma_c|}
 \end{equation}
 
 
@@ -88,27 +89,28 @@ AA \cite{adamic2003friends} is a popular measure designed to capture the notion 
 
 \begin{equation}
 \label{eq:aa}
-  AA(a, b) = \sum_{c\ \in\ \Gamma_a \cup \Gamma_b} \frac{1}{\log{|\Gamma_c|}}
+  AA(a, c) = \sum_{b\ \in\ \Gamma_a \cup \Gamma_c} \frac{1}{\log{|\Gamma_b|}}
 \end{equation}
 
 
 \subsubsection{Resource Allocation (RA)}
 
-The RA metric \cite{zhou2010solving} is based on the concept of heat diffusion in a network, emphasizing that heavily connected nodes may not play a critical role in facilitating resource flow between other nodes. Unlike AA, RA penalizes high-degree common neighbors more heavily. The score between nodes $a$ and $b$ is determined by Equation \ref{eq:ra}.
+The RA metric \cite{zhou2010solving} is based on the concept of heat diffusion in a network, emphasizing that heavily connected nodes may not play a critical role in facilitating resource flow between other nodes. Unlike AA, RA penalizes high-degree common neighbors more heavily. The score between nodes $a$ and $c$ is determined by Equation \ref{eq:ra}.
 
 \begin{equation}
 \label{eq:ra}
-  RA(a, b) = \sum_{c\ \in\ \Gamma_a \cup \Gamma_b} \frac{1}{|\Gamma_c|}
+  RA(a, c) = \sum_{b\ \in\ \Gamma_a \cup \Gamma_c} \frac{1}{|\Gamma_b|}
 \end{equation}
 
 Note that the CN, AA, and RA metrics lack normalization, and thus only convey ranking information \cite{wang2014link}. In practical applications, one should choose the right metric based on the network's characteristics --- there is no universally dominating metric \cite{zhou2021progresses, ghasemian2020stacking, wang2014link, liben2003link}.
+%% NOTE; What is the complexity of each similarity metric. Mention at the end of all in preliminaries.
 
 
 
 
 \subsection{Measuring Prediction Quality}
 
-A number of measures are used to assess link prediction performance. These include precision, recall, F1 score, and Area Under the Receiver Curve (AUC) \cite{arrar2023comprehensive}. However, AUC is insufficient for early quality assessment, as it may inaccurately favor algorithms ranking many negatives at the bottom \cite{zhou2021progresses, yang2015evaluating, lichtnwalter2012link}. Accordingly, we focus on precision, recall, and F1 score in this report.
+A number of measures are used to assess link prediction performance. These include precision, recall, F1 score, and Area Under the Receiver Curve (AUC) \cite{arrar2023comprehensive}. However, AUC is insufficient for early quality assessment, as it may inaccurately favor algorithms ranking many negatives at the bottom \cite{zhou2021progresses, yang2015evaluating, lichtnwalter2012link}. Accordingly, we focus on precision, recall, and F1 score in this report \cite{lu2015toward}.
 
 
 \subsubsection{Precision}
@@ -147,6 +149,6 @@ A majority of link prediction studies apply random division of the ground-truth 
 
 \subsection{Baseline Approach for Neighborhood-based Link Prediction}
 
-A baseline approach for neighborhood-based link prediction involves computing similarity scores between all non-connected node pairs $\{(i, j)\ |\ i, j \in V; (i, j) \notin E\}$, and returning the node pairs with top-$k$ scores as the predicted links. The similarity score is computed by assessing the commonality of neighbors between the two nodes. This approach is used by an number of studies previously mentioned \cite{gatadi2023lpcd, saifi2023fast, benhidour2022approach, mumin2022efficient, rafiee2020cndp, guo2019node, yang2015new, papadimitriou2012fast, wang2019link}. Notably, popular network analysis software packages such as NetworKit \cite{staudt2016networkit} and igraph \cite{csardi2006igraph} also implement this baseline approach.
+A baseline approach for neighborhood-based link prediction involves computing similarity scores between all non-connected node pairs $\{(a, c)\ |\ a, c \in V; (a, c) \notin E\}$, and returning the node pairs with top-$k$ scores as the predicted links. The similarity score is computed by assessing the commonality of neighbors between the two nodes. This approach is used by an number of studies previously mentioned \cite{gatadi2023lpcd, saifi2023fast, benhidour2022approach, mumin2022efficient, rafiee2020cndp, guo2019node, yang2015new, papadimitriou2012fast, wang2019link}. Notably, popular network analysis software packages such as NetworKit \cite{staudt2016networkit} and igraph \cite{csardi2006igraph} also implement this baseline approach.
 
-While this approach is simple to understand, it has severe computational costs. Finding the common neighbors $\Gamma_i \cap \Gamma_j$ of node pairs $(i, j)$ using a naive method has a time complexity of $O(D^2)$, where $D$ is the degree of the maximum degree node in the graph. This results in an overall time complexity of $O(N^2D^2)$. Using a hashtable, one can only reduce the time complexity to $O(N^2D)$. Additionally, this method involves significant unnecessary computations, as many node pairs are likely to lack common neighbors.
+While this approach is simple to understand, it has severe computational costs. Finding the common neighbors $\Gamma_a \cap \Gamma_c$ of node pairs $(a, c)$ using a naive method has a time complexity of $O(D^2)$, where $D$ is the degree of the maximum degree node in the graph. This results in an overall time complexity of $O(N^2D^2)$. Using a hashtable, one can only reduce the time complexity to $O(N^2D)$. Additionally, this method involves significant unnecessary computations, as many node pairs are likely to lack common neighbors.
