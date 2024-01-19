@@ -1,13 +1,13 @@
 \begin{figure*}[hbtp]
   \centering
-  \subfigure[Runtime in seconds (logarithmic scale) for link prediction using various similarity measures, with IHub approach]{
+  \subfigure[Runtime in seconds (logarithmic scale) for link prediction using various similarity measures, with \textit{IHub} approach]{
     \label{fig:standard1--runtime}
     \includegraphics[width=0.98\linewidth]{out/standard1-runtime.pdf}
   }
-  \subfigure[Precision of predicted links, in percentage (logarithmic scale), of the best neighborhood-based link prediction method]{
+  \subfigure[F1 score of predicted links (logarithmic scale) for link prediction using various similarity measures, with \textit{IHub} approach]{
     \label{fig:standard1--f1score}
     \includegraphics[width=0.98\linewidth]{out/standard1-f1score.pdf}
   } \\[-2ex]
-  \caption{TODO. Runtime in seconds (log-scale), and precision of predicted links, in percentage (log-scale), of the best neighborhood-based link prediction method (considering both the precision and runtime), on batch sizes of $10^{-4}|E|$ to $0.1|E|$ for each graph in the dataset. None of the methods succeed in predicting ground-truth links for \textit{kmer\_V1r}, and for \textit{asia\_osm} and \textit{kmer\_A2a} on batch sizes of $10^{-4}|E|$ to $10^{-3}|E|$, and thus their results are not shown. Note that the numerical suffix added to the acronym of each link prediction method indicates the hub limit $L_H$ parameter setting.}
+  \caption{Runtime (log-scale) and F1 score (log-scale) for link prediction using various similarity measures with the \textit{IHub} approach, when attempting to predict $0.1|E|$ unobserved edges $E^U$ for each graph in the dataset.}
   \label{fig:standard1}
 \end{figure*}

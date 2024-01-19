@@ -15,101 +15,69 @@ We employ 32-bit integers to represent vertex IDs and 32-bit floats for score co
 
 The graphs used in our experiments are given in Table \ref{tab:dataset}. These are sourced from the SuiteSparse Matrix Collection \cite{suite19}. In the graphs, number of vertices vary from $3.07$ to $214$ million, and number of edges vary from $25.4$ million to $3.80$ billion. We ensure edges to be undirected and weighted with a default of $1$.
 
-
-\subsubsection{Observed Graph generation}
-
-To generate the observed graphs, we take each graph from the dataset and randomly remove $10^-4|E|$ to $0.1|E|$ edges from it --- where the endpoints of removed edges are chosen with uniformly probability.\ignore{For each batch size, we generate five random batch updates for averaging.}
-The evaluation involves splitting ground-truth links ($E$) into observed ($E^O$) and unobserved ($E^U$) sets, using $E^O$ for known information and $E^U$ for algorithm evaluation \cite{arrar2023comprehensive}.
-The majority of known studies apply ‘‘random division’’, namely $E^P$ is randomly drawn from $E$ \cite{zhou2021progresses}.
-Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
-
-\ignore{Are there no missing links in the original graphs?}
-\ignore{Runtime + speedup + precision for $0.1|E|$.
-Lu et al. \cite{lu2015toward} use precision.}
-\ignore{What is the expected precision of random guess?}
-\ignore{Why the choice of best method appears to change with batch size?}
-
 \input{src/tab-dataset}
+
+
+\subsubsection{Generating Observed graph and Unobserved edges}
+\label{sec:generate-batch}
+
+To generate the observed graph $E^O$ and unobserved edges $E^U$, we randomly remove $10^{-2}|E|$ to $0.1|E|$ edges from each graph in the dataset. The removed edges constitute the unobserved edges $E^U$, with the endpoints chosen uniformly at random \cite{zhou2021progresses}. The number of unobserved edges $|E^U|$ is typically set at $10\%$ of the total links in $E$, i.e., $0.1|E|$ based on empirical findings, ensuring statistically robust results without significantly altering the network's structure \cite{lu2015toward}.
+
+
+\subsubsection{Expected precision of Random guess}
+
+We now discuss the expected precision of a random guess (instead of using a link prediction algorithm). For an observed graph $G(V, E)$, with $N$ vertices and $M$ edges, there are $N(N-1)/2 - M$ possible links, and thus expected the expected precision for predicting $|P|$ edges is $1 / {}_{{N(N-1)/2 - M}} C_{|P|}$. This is an incredibly small number. For instance, on a graph with $10$ vertices and $100$ edges, correctly predicting all $|P| = 10$ has a probability of $3\times10^{-11}$.
+
+
+\subsubsection{Measuring Prediction quality}
+
+As previously stated, we rely on F1 score, the harmonic mean of precision and recall, to evaluate link prediction performance \cite{lu2015toward}. This choice is made due to concerns that AUC may inaccurately favor algorithms ranking many negatives at the bottom \cite{zhou2021progresses, yang2015evaluating, lichtnwalter2012link}.
+
+
+\subsubsection{Missing links in the original graphs}
+
+There might be missing links in the original dataset graphs, and link prediction algorithms could attempt to predict them, although we currently lack a method to verify this. While working with temporal graphs could address this issue, the available temporal graphs are not sufficiently large. As a result, our current focus is on static graphs in the dataset, while generating observed graphs and unobserved edges. The exploration of temporal graphs is planned for future work.
+
+
+\subsubsection{Heterogeneity of the graphs}
+
+Real-world graphs are often heterogeneous, with diverse linking patterns throughout the graph. Consequently, using a single link prediction method may not be ideal. Instead, employing different link prediction methods on distinct regions of the graph may be more suitable. However, our belief is that a specific linking pattern dominates the graph, allowing us to identify an overall suitable link prediction method.
 
 
 
 
 \subsection{Comparative Performance Evaluation}
-%% Performance Comparison
 
-In this section, we compare the performance of our approach, i.e., disregarding large hubs, and compare it with the default approach. We does this for observed graphs based on each graph in the dataset, with $10^-2|E|$ to $0.1|E|$ edges removed (the endpoints of removed edges are chosen with uniformly probability, as mentioned above), and predict the same number of edges with both approaches. For each observed graph, we predict links using the default approach, and our approach with suitable $MAX\_MEDIATOR\_DEGREE$, as identified in Section X. In Figures X, Y, and Z, we plot the runtimes, speedup, and precision respectively of only the best approach for each graph (both in terms of precision and runtime). In the figures, the labels indicate the acronyms of the similarity metric used, followed by the value of $MAX\_MEDIATOR\_DEGREE$ ($\Pi$) parameter setting (i.e., the label $HP4$ stands for the Hub Promoted similarity metric, with a $MAX\_MEDIATOR\_DEGREE$ of $4$, i.e., we avoid first order neighbors with degree greater than $4$). Note that a $MAX\_MEDIATOR\_DEGREE$ of $\infty$ is essentially the default/baseline approach. As Figures X, Y, and Z show, our approach is on average X times faster than the baseline/default approach, while predicting links with on average X\% higher precision. On the \textit{sk-2005} graph with $0.1|E|$ edges removed, our approach achieves a link prediction rate of X edges/s, and a processing rate of Y edges/s.
-
-Although $|E^P|$ is generally unknown, an experiential and reasonable setting is  $|E^P| = 0.1 |E|$ because $10\%$ of links in the probe set are usually enough for us to get statistical solid results while the removal of $10\%$ of links will probably not destroy the structural features of the target network \cite{lu2015toward}.
-
-\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
-
-\ignore{Explain the confusion y-axis on precision.}
-
-\ignore{Sizes of graphs are large so running other approaches (\Pi) is expensive.}
-
-\ignore{What is the processing / prediction rate? (by predicted edges, and by number of edges in the graph)}
-
-\ignore{Comparison with baseline approach ($\infty$), i.e., exploring all possible/reachable pairs at distance 2, and quickly computing intersection, scores, adding to heap, and merging across threads. Explain with figure in approach.}
-
-\ignore{Why not showcase 0.01 E and 0.1 E, and remove the other plots?}
-
-\ignore{Runtime + speedup + precision for $0.1|E|$.
-Lu et al. \cite{lu2015toward} use precision.}
-
-\ignore{Why is precision low?}
-\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
-\ignore{It is possible that our algorithm only explores one type of connection, but the networks have various types of connections.}
-\ignore{Quantifying a network's link predictability allows us to (i) evaluate predictive algorithms associated with the network, (ii) estimate the extent to which the organization of the network is explicable, and (iii) monitor sudden mechanistic changes during the network's evolution. The hypothesis of this paper is that a group of links is predictable if removing them has only a small effect on the network's structural features. We introduce a quantitative index for measuring link predictability and an algorithm that outperforms state-of-the-art link prediction methods in both accuracy and universality. This study provides fundamental insights into important scientific problems and will aid in the development of information filtering technologies \cite{lu2015toward}.}
-\ignore{Are there no missing links in the original graphs?}
-\ignore{Arent graphs heterogeneous? Why one method works?}
-\ignore{Why do these methods perform well?}
-
-
-\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
-\ignore{Explain the confusion y-axis on precision.}
-\ignore{On a set of smaller graphs, we observe/identify the most precise approaches, and observe the X, X, and X to perform the best. Accordingly, we run these methods on the graphs in our dataset.}
-\ignore{Comparison with baseline approach ($\infty$), i.e., exploring all possible/reachable pairs at distance 2, and quickly computing intersection, scores, adding to heap, and merging across threads. Explain with figure in approach.}
-\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
-
-
-\ignore{Can you show details plots? No.}
-
-% Figure X shows the average runtime of link prediction with degree threshold $D$ of $4$, $8$, $16$, and $32$. Increasing $D$ increases runtime by a small amount, due to increase second-degree neighbor exploration. Increasing/decreasing the batch size however does not have an effect on runtime, as the algorithm must continue to explore possible links with higher scores even if batch/prediction size $B$ edges have been added to the prediction list. Note that runtime for link prediction with JC/HP similarity scores is nearly identical. On a batch size of $0.1 |E|$, we compare the predicted links with the links in the original graphs (without edge deletions). We observe that HP-based link prediction with $D = 16$ obtains the highest average accuracy of $2.4\%$, while HP-based link prediction with $D = 4$ obtains the highest average precision of $6.4\%$. Given the vast set of potential predictions (${}_N C_2 - |E|$), achieving high accuracy and precision remains a challenge.
+In this section, we compare the performance of the LHub approach, which disregards large hubs, with the IHub approach (which does not). We conduct this comparison for observed graphs $E^O$ based on each graph in the dataset, with $10^{-2}|E|$ to $0.1|E|$ unobserved edges. This involves removing $10^{-2}|E|$ to $0.1|E|$ edges, with endpoints chosen uniformly at random (as explained in Section \ref{sec:generate-batch}). We predict the same number of edges with both approaches, i.e., $N_P = 10^{-2}|E|$ or $0.1|E|$. For each observed graph, we predict links using the IHub approach and the LHub approach with a suitable hub limit $L_H$ identified in Section \ref{sec:select-limit}. In Figures \ref{fig:input-large--runtime}, \ref{fig:input-large--speedup}, and \ref{fig:input-large--f1score}, we plot the runtimes, speedups, and F1 scores, respectively, for only the best approach for each graph (considering both F1 score and runtime). In the figures, the labels indicate the abbreviations of the similarity metric used, followed by the value of the hub limit $L_H$ parameter setting (e.g., the label $CN32$ stands for the Common Neighbors (CN) similarity metric, with a hub limit $L_H$ of $32$, where first order neighbors with a degree greater than $32$ are avoided). It's worth noting that a hub limit $L_H$ of $\infty$ essentially represents the IHub approach. Note that we were unable to run the IHub approach on large web graphs, such as \textit{webbase-2001}, \textit{it-2004}, and \textit{sk-2005}, due to high runtimes, and their plots are not shown.
 
 \input{src/fig-input-large}
+\input{src/fig-phase-split}
 \input{src/fig-strong-scaling}
 
+As seen in Figure \ref{fig:input-large}, the LHub approach is, on average, over $963\times$ and $163\times$ faster than the IHub approach with $10^{-2}|E|$ and $0.1|E|$ unobserved edges, respectively. It achieves this speedup while predicting links with an average F1 score that is $61\%$ higher and $16\%$ lower, respectively --- meaning similar F1 scores without being too low or high. Notably, on the \textit{sk-2005} graph with $0.1|E|$ edges removed, LHub achieves a link prediction rate of $38.1M$ edges/s.
 
+Furthermore, we observe that link prediction with the RA metric excels, in terms of both F1 score and runtime, on web graphs and social networks when using the IHub approach. Meanwhile, link prediction with the JC similarity metric outperforms others on road networks and protein k-mer graphs. With the LHub approach and $10^{-2}|E|$ unobserved edges, link prediction with the CN metric (hub limit $L_H$ of $32$) excels on web graphs and social networks. For road networks, link prediction with the LHN metric (hub limit $L_H$ of $4$) performs the best, and for protein k-mer graphs, link prediction with the JC metric (hub limit $L_H$ of $256$) is optimal. However, with $0.1|E|$ unobserved edges, link prediction with the CN metric (hub limit $L_H$ of $32$) proves to be the best across all graphs. Figures \ref{fig:standard2}, \ref{fig:standard1}, \ref{fig:pruned2}, \ref{fig:pruned1} show the runtimes and F1 scores for link prediction with all similarity measures. Notably, in Figures \ref{fig:pruned2} and \ref{fig:pruned1}, LHub approach using the AA and RA metrics performs similarly to the CN metric, but with longer runtimes.
 
-
-\subsection{Selecting Suitable Similarity Metric}
-
-Extensive experiments \cite{ghasemian2020stacking} show that no known link predictor performs best or worst across all inputs \cite{zhou2021progresses}.\ignore{We expect a larger fraction of algorithms in the future studies will be designed for networks of particular types \cite{zhou2021progresses}.} In this section, we select a suitable similarity metric for link prediction for each type of graph. For this, we generate observed graphs from each graph in the dataset, such that $10^-4|E|$ to $0.1|E|$ edges are removed (the endpoints of removed edges are chosen with uniformly probability), and predict the same number of edges using the best approach for each observed graph (as identified in Section X).
-
-In Figures X and Y, we plot the runtimes and precision of the best approach for each graph (both in terms of precision and runtime). As above, the labels in the figures indicate the acronyms of the similarity metric used, followed by the value of $MAX\_MEDIATOR\_DEGREE$ ($\Pi$) parameter setting. As Figures X, Y, and Z show, approach X is suitable for web graph. On a set of smaller graphs (not shown here), we observe that approach X is suitable for co-citation graphs.
-
-\ignore{What does precision mean in the plots? \% of matching links with ground truth? How many ground truth links were missed?}
-
-\ignore{Explain the confusion y-axis on precision.}
-
-\ignore{Selecting best approach based on precision and runtime, for batch size $10^{-4}|E|$ to $0.1|E|$, and present the result. The runtime and precision of each method (appendix).}
-
-\ignore{Sizes of graphs are large so running other approaches is expensive.}
-
-\ignore{Why precision on road networks and protein k-mer graphs low? (low average degrees)}
-
-\ignore{What we observe on our dataset? What we observe on smaller graphs?}
+Next, we note that the IHub approach achieves an average F1 score of $2.0\times10^{-2}$ and $9.2\times10^{-2}$ when predicting $10^{-2}|E|$ and $0.1|E|$ edges, respectively. In comparison, the LHub approach achieves higher F1 scores, averaging $3.2\times10^{-2}$ and $9.8\times10^{-2}$, respectively. Additionally, we observe that the F1 score tends to be higher on web graphs and social networks but significantly lower on road networks and protein k-mer graphs. This discrepancy is likely due to the average degree of the graphs, as local/neighborhood-based link prediction methods rely on the neighborhood of vertices up to a distance of $2$. Graphs with lower average degree provide less information to such methods for predicting edges. While these F1 scores may seem low (compared to the highest possible F1 score of $1$), it's important to consider that they are significantly higher than random predictions. Although machine learning-based approaches might achieve higher F1 scores, neighborhood-based similarity measures excel in computational efficiency (both in terms of runtime and space) and interpretability, as mentioned earlier.
 
 \ignore{Why the choice of best method appears to change with batch size?}
+\ignore{Why do these methods perform well?}
+\ignore{What we observe on our dataset? What we observe on smaller graphs?}
 
+
+
+
+\subsection{Performance Analysis}
+
+In this section, we examine the phase split of the LHub approach to identify further optimization opportunities. To do this, we generate an observed graph $E^O$ with $0.1|E|$ unobserved edges $E^U$ for each dataset graph using random division, as detailed in Section \ref{sec:generate-batch}. For each observed graph, we predict $0.1|E|$ links using the LHub approach and the similarity measures outlined in Section \ref{sec:metrics}, utilizing the appropriate hub limit $L_H$ value, as per Section \ref{sec:select-limit}.
+
+Figure \ref{fig:strong-scaling} shows that LHub, spends a majority of its runtime, $63\%$ on average, in the scoring phase. This is particularly notable in social networks with a high average degree. However, a substantial amount of time is still spent on the merging phase, which involves combining predicted edges with top-$k$ scores from each thread into a global top-$k$ list of predicted edges. The sequential nature of the merging phase likely contributes to this runtime, and addressing this aspect is a potential focus for future work.
 
 
 
 
 \subsection{Strong Scaling}
 
-Finally, we assess the strong scaling performance of our optimized neighbor-based link prediction methods. In this analysis, we vary the number of thread from $1$ to $32$ in multiples of $2$ for each input graph, and measure the average time taken to predict $10^{-2}|E|$ links by Hub Promoted (HP), Leicht-Holme-Nerman (LHN), Adamic-Adar Coefficient (AA), and Resource Allocation (RA) based link prediction methods with the \textit{MAX\_MEDIATOR\_DEGREE} parameter set to $4$. The results are shown in Figure \ref{fig:strong-scaling}. It not only illustrates the overall scaling performance, but the also scaling of the two phases of each link prediction method, i.e., identifying edges with top-k scores in each thread (scoring phase), and combining the scores obtained by each thread to obtain the global top-k edges (merging phase). With $32$ threads, our optimized link prediction methods achieve an overall speedup of $7.2\times$ (with respect to sequential execution), indicating a performance increase of $1.5\times$ for every doubling of threads. The scalability is limited, as the cost of the merging phase increases with an increase in the number of threads. In fact, at $32$ threads, the merging phase obtains a speedup of $0.7\times$ (yes it is less than $1$\ignore{, as its runtime increases}), while the scoring phase achieves a speedup of $18.5\times$.
+In the final analysis, we evaluate the strong scaling performance of the LHub approach, where we perform link prediction while disregarding large hubs. The assessment involves varying the number of threads from $1$ to $32$ in multiples of $2$ for each input graph. We measure the average time taken to predict $0.1|E|$ links using similarity measures defined in Section \ref{sec:metrics}, incorporating the best hub limit $L_H$ setting identified in Section \ref{sec:select-limit}. Figure \ref{fig:strong-scaling} presents the results, illustrating not only the overall scaling performance but also the scaling of the two phases of each link prediction method: identifying edges with top-$k$ scores in each thread (\textit{scoring phase}) and combining scores across threads to obtain the global top-$k$ edges (\textit{merging phase}).
 
-\ignore{Why is string scaling of our link prediction approach low? Why is it especially for the merging phase?}
-
-% \input{src/fig-input-small}
+With $32$ threads, the LHub approach achieves an overall speedup of $12.4\times$ compared to sequential execution, indicating a performance increase of $1.7\times$ for every doubling of threads. The scalability is limited, as the cost of the merging phase increases with an increase in the number of threads, and because the merging is performed with sequential execution. In fact, at $32$ threads, the merging phase obtains a speedup of $0.7\times$ (less than $1$, as its runtime increases), while the scoring phase achieves a speedup of $18.5\times$.
