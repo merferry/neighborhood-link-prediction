@@ -1,6 +1,6 @@
 \begin{figure}[hbtp]
   \centering
   \includegraphics[width=0.98\linewidth]{out/strong-scaling-speedup.pdf} \\[-2ex]
-  \caption{Overall speedup of \textit{LHub} approach for link prediction, and its phases (obtaining edges with top-k scores per thread, and merging scores from each thread into a common scoreboard), with $10^{-2}|E|$ unobserved edges, with increasing number of threads (in multiples of 2). Increasing the number of threads causes the work in merging phase to increase, thus leading to a poor speedup.}
+  \caption{Overall speedup of our approach of \textit{Disregarding Large Hubs (DLH)} for link prediction, and its phases (obtaining edges with top-k scores per thread, and merging scores from each thread into a common scoreboard), with $10^{-2}|E|$ unobserved edges, with increasing number of threads (in multiples of 2). Increasing the number of threads causes\ignore{the} work in merging phase to increase, thus leading to a poor speedup.}
   \label{fig:strong-scaling}
 \end{figure}

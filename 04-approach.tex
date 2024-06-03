@@ -1,4 +1,4 @@
-\subsection{Our Improved Approach (IHub)}
+\subsection{Our Improved Baseline Approach (IBase)}
 
 \subsubsection{Avoiding node pairs with no common neighbors}
 
@@ -39,35 +39,35 @@ To parallelize the computation, we partition the graph among threads, employing 
 
 \ignore{An alternative approach to merge per-thread top-$k$ prediction lists involves concatenating the per-thread lists into a single prediction list, performing a parallel sort, and truncating all predicted edges except the top-$k$. However, this method can lead to out-of-memory crashes on large graphs due to the size of the concatenated prediction list.}
 
-We call this approach IHub. It has a time complexity of $O(ND^2)$, where $N$ is the number of vertices in the graph, and $D$ is the maximum degree of a vertex in the graph.\ignore{It's worth noting that the results obtained by our parallel algorithm are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.}
+We call this approach IBase. It has a time complexity of $O(ND^2)$, where $N$ is the number of vertices in the graph, and $D$ is the maximum degree of a vertex in the graph.\ignore{It's worth noting that the results obtained by our parallel algorithm are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.}
 
 
 
 
-\subsection{Our Heuristic Approach which Disregards Large Hubs (LHub)}
+\subsection{Our Heuristic Approach which Disregards Large Hubs (DLH)}
 
 \subsubsection{Explanation of the approach}
 
 To optimize link prediction further, we recognize that low-degree nodes, representing users with few connections in the social network, are more selective in accepting friend requests and are likely to form connections with people they have stronger, more meaningful relationships with, such as close friends and family. Thus, low-degree nodes confer significant similarity among their neighbors, while high-degree nodes generally do not (due to their lack of selectivity). We call such high-degree nodes as large hubs. Accordingly, for a given vertex $a$ and each of its immediate neighbors $b$, we only explore the neighbors $c \in \Gamma_b$ of $b$ if the degree of $b$ is within a certain threshold $L_H$, i.e., $|\Gamma_b| \leq L_H$. We call this threshold as the \textit{hub limit}. This minimizes DFS exploration of second-degree neighbors $c$ during computation of neighbor-based similarity scores.
 
-We call this approach LHub. It has the same time complexity as IHub, i.e., $O(ND^2)$, but significantly outperforms it by runtime, while achieving the same or better prediction quality.
+We call this approach DLH. It has the same time complexity as IBase, i.e., $O(ND^2)$, but significantly outperforms it by runtime, while achieving the same or better prediction quality.
 
 
 \subsubsection{A simple example}
 
-Figure \ref{fig:about-pruning} demonstrates the LHub approach. Here, we consider the neighborhood of vertex $1$ in a graph, where $1$ is outlined in black, its first-order neighbors in red, its second-order neighbors in blue, and explored/traversed vertices are shown with a yellow fill. The arrows in the figure indicate the direction of DFS traversal, and for figure simplicity, three neighbors of vertex $2$ are omitted (shown with dotted edges).
+Figure \ref{fig:about-pruning} demonstrates the DLH approach. Here, we consider the neighborhood of vertex $1$ in a graph, where $1$ is outlined in black, its first-order neighbors in red, its second-order neighbors in blue, and explored/traversed vertices are shown with a yellow fill. The arrows in the figure indicate the direction of DFS traversal, and for figure simplicity, three neighbors of vertex $2$ are omitted (shown with dotted edges).
 
-\ignore{\paragraph{Standard approach (IHub)}}
+\ignore{\paragraph{Standard approach (IBase)}}
 
-Figure \ref{fig:about-pruning--01} depicts the standard approach, which considers all second-order neighbors of vertex $1$ for score computation, i.e. vertices $6$ to $12$. This is the process followed by the IHub approach.
+Figure \ref{fig:about-pruning--01} depicts the standard approach, which considers all second-order neighbors of vertex $1$ for score computation, i.e. vertices $6$ to $12$. This is the process followed by the IBase approach.
 
-\ignore{\paragraph{Disregards hubs with degree $> 8$ (LHub)}}
+\ignore{\paragraph{Disregards hubs with degree $> 8$ (DLH)}}
 
-Figure \ref{fig:about-pruning--02} depicts our LHub approach. It considers only second-order neighbors linked to vertex $1$ by a small hub, with a degree $\leq 8$, for score computation --- i.e., vertices $9$ to $12$ which are linked to $1$ through vertices $3$, $4$, and $5$. It is based on the idea, as mentioned above, that low-degree vertices contribute more similarity among their neighbors, while vertices with high degree do not.\ignore{This minimization of exploration significantly reduces runtime and enhances prediction quality, as discussed in Section \ref{sec:select-limit}.} Note that second-order neighbors of $1$ can still be considered if linked to $1$ by a small hub (e.g., vertex $9$ linked to $1$ through $3$).
+Figure \ref{fig:about-pruning--02} depicts our DLH approach. It considers only second-order neighbors linked to vertex $1$ by a small hub, with a degree $\leq 8$, for score computation --- i.e., vertices $9$ to $12$ which are linked to $1$ through vertices $3$, $4$, and $5$. It is based on the idea, as mentioned above, that low-degree vertices contribute more similarity among their neighbors, while vertices with high degree do not.\ignore{This minimization of exploration significantly reduces runtime and enhances prediction quality, as discussed in Section \ref{sec:select-limit}.} Note that second-order neighbors of $1$ can still be considered if linked to $1$ by a small hub (e.g., vertex $9$ linked to $1$ through $3$).
 
-\ignore{\paragraph{Disregards hubs with degree $> 4$ (LHub)}}
+\ignore{\paragraph{Disregards hubs with degree $> 4$ (DLH)}}
 
-Lastly, Figure \ref{fig:about-pruning--03} shows the LHub approach, considering only second-order neighbors linked to vertex $1$ by a small hub with a degree $\leq 4$ ($11$ and $12$ linked to $1$ through $4$ and $5$). First order neighbors of $1$ with a degree $> 4$ are considered large hubs, and thus their second-order neighbors are disregarded.\ignore{This approach is applied to all vertices in the graph. Note that Figure \ref{fig:about-pruning} only shows the neighborhood of vertex $1$.}
+Lastly, Figure \ref{fig:about-pruning--03} shows the DLH approach, considering only second-order neighbors linked to vertex $1$ by a small hub with a degree $\leq 4$ ($11$ and $12$ linked to $1$ through $4$ and $5$). First order neighbors of $1$ with a degree $> 4$ are considered large hubs, and thus their second-order neighbors are disregarded.\ignore{This approach is applied to all vertices in the graph. Note that Figure \ref{fig:about-pruning} only shows the neighborhood of vertex $1$.}
 % The \textit{Improved} approach is when we set the max mediator degree to $\infty$.
 % We will next which parameter setting of max mediator degree is suitable.
 % NOTE: In the figure, explored vertices are shown with a yellow fill.
@@ -78,7 +78,7 @@ Lastly, Figure \ref{fig:about-pruning--03} shows the LHub approach, considering 
 
 \subsubsection{Non-determinism in the result}
 
-It's worth noting that the results obtained by our parallel algorithms (IHub and LHub) are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.
+It's worth noting that the results obtained by our parallel algorithms (IBase and DLH) are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.
 
 
 
@@ -86,17 +86,17 @@ It's worth noting that the results obtained by our parallel algorithms (IHub and
 \subsection{Selecting Suitable Hub Limit for each Similarity Metric}
 \label{sec:select-limit}
 
-We now select a suitable hub limit $L_H$, i.e., a degree above which a vertex is considered a large hub, for each similarity metric presented in Section \ref{sec:metrics}. For this, we adjust the hub limit $L_H$ from $2$ to $1024$ (in multiples of $2$), for each similarity metric, and adjust the number of unobserved edges $E^U$ from $10^{-4}|E|$ to $0.1|E|$ on a number of graphs. We then apply each similarity metric based link prediction to predict $N_P = |E^U|$ edges with the highest similarity scores. We also test with a hub limit $L_H$ of $\infty$, which is\ignore{essentially} the IHub approach.
+We now select a suitable hub limit $L_H$, i.e., a degree above which a vertex is considered a large hub, for each similarity metric presented in Section \ref{sec:metrics}. For this, we adjust the hub limit $L_H$ from $2$ to $1024$ (in multiples of $2$), for each similarity metric, and adjust the number of unobserved edges $E^U$ from $10^{-4}|E|$ to $0.1|E|$ on a number of graphs. We then apply each similarity metric based link prediction to predict $N_P = |E^U|$ edges with the highest similarity scores. We also test with a hub limit $L_H$ of $\infty$, which is\ignore{essentially} the IBase approach.
 
-Figure \ref{fig:adjust-mindegree--runtime} shows the mean runtime taken for each similarity metric, with each hub limit $L_H$, and with the number of unobserved edges $E^U$ ranging from $10^{-4}|E|$ to $0.1|E|$, while Figure \ref{fig:adjust-mindegree--precision} shows the mean F1 score of the predicted edges, with the IHub and LHub approaches. Results indicate that selecting a lower hub limit $L_H$ decreases the overall runtime of the LHub approach. In terms of both F1 score and relative runtime, we observe that a hub limit $L_H$ of $4$ is suitable for HP and LHN metrics, a hub limit $L_H$ of $32$ is suitable for CN and AA metrics, and a hub limit $L_H$ of $256$ is suitable for the remaining metrics (i.e., JC, SI, SC, HD, and RA). These hub limits are highlighted with thick lines in the figures. Further, as Figure \ref{fig:adjust-overall} shows, hub limits $L_H$ of $4$, $32$, and $256$ offer a mean speedup of $67\times$, $32\times$, and $13\times$ when the number of unobserved edges $E^U$ is $0.1|E|$. Indeed, disregarding large hubs, with the LHub approach, offers a significant improvement in performance with little to no degradation in the accuracy of link prediction.
+Figure \ref{fig:adjust-mindegree--runtime} shows the mean runtime taken for each similarity metric, with each hub limit $L_H$, and with the number of unobserved edges $E^U$ ranging from $10^{-4}|E|$ to $0.1|E|$, while Figure \ref{fig:adjust-mindegree--precision} shows the mean F1 score of the predicted edges, with the IBase and DLH approaches. Results indicate that selecting a lower hub limit $L_H$ decreases the overall runtime of the DLH approach. In terms of both F1 score and relative runtime, we observe that a hub limit $L_H$ of $4$ is suitable for HP and LHN metrics, a hub limit $L_H$ of $32$ is suitable for CN and AA metrics, and a hub limit $L_H$ of $256$ is suitable for the remaining metrics (i.e., JC, SI, SC, HD, and RA). These hub limits are highlighted with thick lines in the figures. Further, as Figure \ref{fig:adjust-overall} shows, hub limits $L_H$ of $4$, $32$, and $256$ offer a mean speedup of $67\times$, $32\times$, and $13\times$ when the number of unobserved edges $E^U$ is $0.1|E|$. Indeed, disregarding large hubs, with the DLH approach, offers a significant improvement in performance with little to no degradation in the accuracy of link prediction.
 %% Also discuss about F1 score.
 
 
 
 
-\subsection{Our implementation of Neighborhood-based Link Prediction}
+\subsection{Our implementation of Disregard Large Hubs (DLH) approach}
 
-We now explain the implementation of our LHub approach for parallel neighborhood-based link prediction, which disregards large hubs. The pseudocode for this is given in Algorithm \ref{alg:predict}. Here, the \texttt{predictLinks} function accepts the input graph $G$, the maximum number of edges to predict $N_P$, a threshold score $S_{th}$, and outputs the list of predicted edges $P$. The algorithm operates in two phases: the scoring phase and the merging phase.
+We now explain the implementation of our DLH approach for parallel neighborhood-based link prediction, which disregards large hubs. The pseudocode for this is given in Algorithm \ref{alg:predict}. Here, the \texttt{predictLinks} function accepts the input graph $G$, the maximum number of edges to predict $N_P$, a threshold score $S_{th}$, and outputs the list of predicted edges $P$. The algorithm operates in two phases: the scoring phase and the merging phase.
 
 In the \textit{scoring phase} (lines \ref{alg:predict--scoring-begin}-\ref{alg:predict--scoring-end}), each vertex is processed in parallel. For each vertex $a$, we scan its second-order neighbors $c$, considering only neighbors of its first order neighbors $b$ which have a degree $|\Gamma_b|$ less than or equal to the hub limit $L_H$\ignore{ --- this is based on the idea that large hubs (here, the first order neighbors) confer little similarity among its neighbors (here, between the current vertex $i$, and its second order neighbors)}. The scoring of potential edges is done in the \texttt{scanEdges} function (lines \ref{alg:predict--scan-begin}-\ref{alg:predict--scan-end}). Here we skip the reverse edges (where $c \leq a$), and calculate a score for each potential second order neighbor $c$ based on the given metric, i.e., for the AA and RA metrics, we apply the scoring formula for each common neighbor $b$, and for the other metrics, we simply count the number of common neighbors. The scores\ignore{, or the number of common neighbors}, are accumulated in a collision-free per-thread hashtable $H_t$.
 

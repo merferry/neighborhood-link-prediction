@@ -1,5 +1,5 @@
 \begin{algorithm}[hbtp]
-\caption{Our Parallel Link Prediction algorithm.}
+\caption{Our Parallel \textit{Disregard Large Hubs (DLH)} approach.}
 \label{alg:predict}
 \begin{algorithmic}[1]
 \Require{$G(V, E)$: Input graph}
@@ -15,7 +15,7 @@
 
 \Statex
 
-\Function{predictLinks}{$G, N_P, S_{th}$} \label{alg:predict--begin}
+\Function{predictLinksDLH}{$G, N_P, S_{th}$} \label{alg:predict--begin}
   \State $\rhd$ Scoring phase
   \State $P_t \gets \{\}$ \textbf{on each thread} \label{alg:predict--scoring-begin}
   \ForAll{$a \in V$ \textbf{in parallel}}
