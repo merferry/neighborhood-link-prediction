@@ -5,9 +5,9 @@
 \Require{$G(V, E)$: Input graph}
 \Require{$N_P$: Maximum number of edges to predict}
 \Require{$S_{th}$: Threshold score above which to predict}
-\Ensure{$a, b, c$: Current vertex, first order, second order neighbor}
+\Ensure{$a, b, c$: Current vertex, first-order, second-order neighbor}
 \Ensure{$L_H$: Hub limit, i.e., large hub degree threshold}
-\Ensure{$|\Gamma_b|$: Degree of first order neighbor $b$}
+\Ensure{$|\Gamma_b|$: Degree of first-order neighbor $b$}
 \Ensure{$H_t$: Collision-free per-thread hashtable}
 \Ensure{$P_t$: Per-thread prediction list}
 \Ensure{$P_h$: Heap for merging per-thread prediction lists}
@@ -19,14 +19,14 @@
   \State $\rhd$ Scoring phase
   \State $P_t \gets \{\}$ \textbf{on each thread} \label{alg:predict--scoring-begin}
   \ForAll{$a \in V$ \textbf{in parallel}}
-    \State $\rhd$ Scan second order neighbors of $a$
+    \State $\rhd$ Scan second-order neighbors of $a$
     \State $H_t \gets \{\}$
     \ForAll{$b \in G.out(a)$}
-      \State $\rhd$ Skip high degree first order neighbors
+      \State $\rhd$ Skip high degree first-order neighbors
       \If{$|\Gamma_b| \leq L_H$} $scanEdges(H_t, G, b)$
       \EndIf
     \EndFor
-    \State $\rhd$ Avoid first order neighbors
+    \State $\rhd$ Avoid first-order neighbors
     \ForAll{$b \in G.out(a)$} $H_t[b] \gets 0$ \label{alg:predict--avoid-neighbors1}
     \EndFor
     \State $\rhd$ Get prediction scores and add to list

@@ -1,8 +1,8 @@
-\subsection{Our Improved Baseline Approach (IBase)}
+\subsection{Our Improved Baseline approach (IBase)}
 
 \subsubsection{Avoiding node pairs with no common neighbors}
 
-As noted earlier, there are a vast number of node pairs $(a, c)$ in a graph with no common neighbors, i.e., $\Gamma_a \cap \Gamma_c = \phi$ (here $\Gamma_a$ represents the neighbors of vertex $a$), and thus have a similarity score of $0$. This is especially true for large sparse graphs. To address this, we limit computation of similarity scores of each vertex $a$ in the graph to its second order neighbors $c$, i.e., to vertices that are neighbors of the immediate neighbors $a$. We do this with a Depth First Search (DFS) traversal from each vertex $a$, limited to a distance of $2$.
+As noted earlier, there are a vast number of node pairs $(a, c)$ in a graph with no common neighbors, i.e., $\Gamma_a \cap \Gamma_c = \phi$ (here $\Gamma_a$ represents the neighbors of vertex $a$), and thus have a similarity score of $0$. This is especially true for large, sparse graphs. To address this, we limit the computation of similarity scores of each vertex $a$ in the graph to its second-order neighbors $c$, i.e., to vertices that are neighbors of the immediate neighbors $a$. We do this with a Depth First Search (DFS) traversal from each vertex $a$, limited to a distance of $2$.
 
 
 \subsubsection{Finding common neighbors faster}
@@ -12,13 +12,12 @@ To expedite the identification of common neighbors between each vertex $a$ and i
 
 \subsubsection{Design of Hashtable}
 
-As C++'s inbuilt \texttt{map} has poor performance, we employ collision-free per-thread hashtables (we discuss later about parallelization), similar to our previous work \cite{sahu2023gvelouvain}. An example of this hashtable for two threads is shown in Figure \ref{fig:about-hashtable}. Each hashtable includes a keys vector, a values vector (of size $|V|$), and a key count. The value associated with each key is stored or accumulated in the index pointed to by the key. To prevent false cache sharing, we independently update the key count of each hashtable and allocate it separately on the heap. As previously mentioned, the vertex IDs of second-order neighbors $c$ of each vertex $a$ serve as keys in the hashtable, and the associated values represent the number of times $c$ has been visited during a DFS traversal (of distance $2$) from $a$. For AA and RA scores, we use a hashtable with integral keys and floating-point values.
+As C++'s inbuilt \texttt{map} has poor performance, we employ collision-free per-thread hashtables (we discuss parallelization later), similar to our previous work \cite{sahu2023gvelouvain}. An example of this hashtable for two threads is shown in Figure \ref{fig:about-hashtable}. Each hashtable includes a keys vector, a values vector (of size $|V|$), and a key count. The value associated with each key is stored or accumulated in the index pointed to by the key. To prevent false cache sharing, we independently update the key count of each hashtable and allocate it separately on the heap. As previously mentioned, the vertex IDs of second-order neighbors $c$ of each vertex $a$ serve as keys in the hashtable, and the associated values represent the number of times $c$ has been visited during a DFS traversal (of distance $2$) from $a$. For AA and RA scores, we use a hashtable with integral keys and floating-point values.
 
-\input{src/fig-about-pruning}
 \input{src/fig-about-hashtable}
 
 
-\subsubsection{Avoiding first order neighbors}
+\subsubsection{Avoiding first-order neighbors}
 
 Once the DFS traversal from vertex $a$ is complete, and all hashtable entries are populated, we clear the entries associated with the first-order neighbors $b$ of $a$. This precaution is necessary because some first-order neighbors of $a$ may have edges with the other first-order neighbors.
 
@@ -30,7 +29,7 @@ With all valid entries in the hashtable populated, we proceed to compute scores 
 
 \subsubsection{Tracking top-k edges}
 
-Since storing all obtained similarity scores is impractical due to the scale of processed graphs, we use a min-heap based prediction list. This min-heap enables us to maintain the top-$k$ edges with the highest similarity scores per thread. It works by evicting the node pair with the lowest score when a new node pair with a higher score is encountered. As an optimization, we convert the per-thread prediction lists into a min-heap only after its have been populated with $k$ entries.
+Since storing all obtained similarity scores is impractical due to the scale of processed graphs, we use a min-heap based prediction list. This min-heap enables us to maintain the top-$k$ edges with the highest similarity scores per thread. It works by evicting the node pair with the lowest score when a new node pair with a higher score is encountered. As an optimization, we convert the per-thread prediction lists into a min-heap only after they have been populated with $k$ entries.
 
 
 \subsubsection{Parallelizing the process}
@@ -44,11 +43,11 @@ We call this approach IBase. It has a time complexity of $O(ND^2)$, where $N$ is
 
 
 
-\subsection{Our Heuristic Approach which Disregards Large Hubs (DLH)}
+\subsection{Our Disregard Large Hubs (DLH) heuristic}
 
 \subsubsection{Explanation of the approach}
 
-To optimize link prediction further, we recognize that low-degree nodes, representing users with few connections in the social network, are more selective in accepting friend requests and are likely to form connections with people they have stronger, more meaningful relationships with, such as close friends and family. Thus, low-degree nodes confer significant similarity among their neighbors, while high-degree nodes generally do not (due to their lack of selectivity). We call such high-degree nodes as large hubs. Accordingly, for a given vertex $a$ and each of its immediate neighbors $b$, we only explore the neighbors $c \in \Gamma_b$ of $b$ if the degree of $b$ is within a certain threshold $L_H$, i.e., $|\Gamma_b| \leq L_H$. We call this threshold as the \textit{hub limit}. This minimizes DFS exploration of second-degree neighbors $c$ during computation of neighbor-based similarity scores.
+To optimize link prediction further, we recognize that low-degree nodes, representing users with few connections in the social network, are more selective in accepting friend requests and are likely to form connections with people they have stronger, more meaningful relationships with, such as close friends and family. Thus, low-degree nodes confer significant similarity among their neighbors, while high-degree nodes generally do not (due to their lack of selectivity). We refer to such high-degree nodes as large hubs. Accordingly, for a given vertex $a$ and each of its immediate neighbors $b$, we only explore the neighbors $c \in \Gamma_b$ of $b$ if the degree of $b$ is within a certain threshold $L_H$, i.e., $|\Gamma_b| \leq L_H$. We call this threshold the \textit{hub limit}. This minimizes DFS exploration of second-degree neighbors $c$ during the computation of neighbor-based similarity scores.
 
 We call this approach DLH. It has the same time complexity as IBase, i.e., $O(ND^2)$, but significantly outperforms it by runtime, while achieving the same or better prediction quality.
 
@@ -59,15 +58,15 @@ Figure \ref{fig:about-pruning} demonstrates the DLH approach. Here, we consider 
 
 \ignore{\paragraph{Standard approach (IBase)}}
 
-Figure \ref{fig:about-pruning--01} depicts the standard approach, which considers all second-order neighbors of vertex $1$ for score computation, i.e. vertices $6$ to $12$. This is the process followed by the IBase approach.
+Figure \ref{fig:about-pruning--01} depicts the standard approach, which considers all second-order neighbors of vertex $1$ for score computation, i.e., vertices $6$ to $12$. This is the process followed by the IBase approach.
 
 \ignore{\paragraph{Disregards hubs with degree $> 8$ (DLH)}}
 
-Figure \ref{fig:about-pruning--02} depicts our DLH approach. It considers only second-order neighbors linked to vertex $1$ by a small hub, with a degree $\leq 8$, for score computation --- i.e., vertices $9$ to $12$ which are linked to $1$ through vertices $3$, $4$, and $5$. It is based on the idea, as mentioned above, that low-degree vertices contribute more similarity among their neighbors, while vertices with high degree do not.\ignore{This minimization of exploration significantly reduces runtime and enhances prediction quality, as discussed in Section \ref{sec:select-limit}.} Note that second-order neighbors of $1$ can still be considered if linked to $1$ by a small hub (e.g., vertex $9$ linked to $1$ through $3$).
+Figure \ref{fig:about-pruning--02} depicts our DLH approach. It considers only second-order neighbors linked to vertex $1$ by a small hub, with a degree $\leq 8$, for score computation --- i.e., vertices $9$ to $12$, which are linked to $1$ through vertices $3$, $4$, and $5$. It is based on the idea, as mentioned above, that low-degree vertices contribute more similarity among their neighbors, while vertices with high degrees do not.\ignore{This minimization of exploration significantly reduces runtime and enhances prediction quality, as discussed in Section \ref{sec:select-limit}.} Note that second-order neighbors of $1$ can still be considered if linked to $1$ by a small hub (e.g., vertex $9$ linked to $1$ through $3$).
 
 \ignore{\paragraph{Disregards hubs with degree $> 4$ (DLH)}}
 
-Lastly, Figure \ref{fig:about-pruning--03} shows the DLH approach, considering only second-order neighbors linked to vertex $1$ by a small hub with a degree $\leq 4$ ($11$ and $12$ linked to $1$ through $4$ and $5$). First order neighbors of $1$ with a degree $> 4$ are considered large hubs, and thus their second-order neighbors are disregarded.\ignore{This approach is applied to all vertices in the graph. Note that Figure \ref{fig:about-pruning} only shows the neighborhood of vertex $1$.}
+Lastly, Figure \ref{fig:about-pruning--03} shows the DLH approach, considering only second-order neighbors linked to vertex $1$ by a small hub with a degree $\leq 4$ ($11$ and $12$ linked to $1$ through $4$ and $5$). First-order neighbors of $1$ with a degree $> 4$ are considered large hubs, and thus their second-order neighbors are disregarded.\ignore{This approach is applied to all vertices in the graph. Note that Figure \ref{fig:about-pruning} only shows the neighborhood of vertex $1$.}
 % The \textit{Improved} approach is when we set the max mediator degree to $\infty$.
 % We will next which parameter setting of max mediator degree is suitable.
 % NOTE: In the figure, explored vertices are shown with a yellow fill.
@@ -75,15 +74,26 @@ Lastly, Figure \ref{fig:about-pruning--03} shows the DLH approach, considering o
 %% Link to algorithm
 %% Explain the name
 
+\input{src/fig-about-pruning}
+
 
 \subsubsection{Non-determinism in the result}
 
-It's worth noting that the results obtained by our parallel algorithms (IBase and DLH) are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.
+It is worth noting that the results obtained by our parallel algorithms (IBase and DLH) are non-deterministic. This is because multiple edges can have matching scores, and the order of edges with the same score may be random due to parallelism.
 
 
 
 
-\subsection{Selecting Suitable Hub Limit for each Similarity Metric}
+\subsection{Framework of our IHub and DLH approaches}
+
+Figure \ref{fig:about-framework} shows the framework of our IBase and DLH approaches. Given an original graph with missing edges, $T$ threads partition the vertices into $T$ sections (using dynamic scheduling). Each thread computes similarity scores between non-connected second-order neighbors for each source vertex, with the option to ignore large hubs (in the DLH approach). Each thread filters the computed scores, retaining only the top $N_p$ edges with scores $\geq S_{th}$. The filtered edges are then merged and globally filtered again to keep the top $N_p$ edges overall, yielding the predicted edges. These predicted edges can be added to the original graph to obtain an updated graph, which can then be used for further analysis.
+
+\input{src/fig-about-framework}
+
+
+
+
+\subsection{Selecting Suitable Hub Limit for each Similarity metric}
 \label{sec:select-limit}
 
 We now select a suitable hub limit $L_H$, i.e., a degree above which a vertex is considered a large hub, for each similarity metric presented in Section \ref{sec:metrics}. For this, we adjust the hub limit $L_H$ from $2$ to $1024$ (in multiples of $2$), for each similarity metric, and adjust the number of unobserved edges $E^U$ from $10^{-4}|E|$ to $0.1|E|$ on a number of graphs. We then apply each similarity metric based link prediction to predict $N_P = |E^U|$ edges with the highest similarity scores. We also test with a hub limit $L_H$ of $\infty$, which is\ignore{essentially} the IBase approach.
@@ -94,11 +104,11 @@ Figure \ref{fig:adjust-mindegree--runtime} shows the mean runtime taken for each
 
 
 
-\subsection{Our implementation of Disregard Large Hubs (DLH) approach}
+\subsection{Our implementation of the Disregard Large Hubs (DLH) approach}
 
 We now explain the implementation of our DLH approach for parallel neighborhood-based link prediction, which disregards large hubs. The pseudocode for this is given in Algorithm \ref{alg:predict}. Here, the \texttt{predictLinks} function accepts the input graph $G$, the maximum number of edges to predict $N_P$, a threshold score $S_{th}$, and outputs the list of predicted edges $P$. The algorithm operates in two phases: the scoring phase and the merging phase.
 
-In the \textit{scoring phase} (lines \ref{alg:predict--scoring-begin}-\ref{alg:predict--scoring-end}), each vertex is processed in parallel. For each vertex $a$, we scan its second-order neighbors $c$, considering only neighbors of its first order neighbors $b$ which have a degree $|\Gamma_b|$ less than or equal to the hub limit $L_H$\ignore{ --- this is based on the idea that large hubs (here, the first order neighbors) confer little similarity among its neighbors (here, between the current vertex $i$, and its second order neighbors)}. The scoring of potential edges is done in the \texttt{scanEdges} function (lines \ref{alg:predict--scan-begin}-\ref{alg:predict--scan-end}). Here we skip the reverse edges (where $c \leq a$), and calculate a score for each potential second order neighbor $c$ based on the given metric, i.e., for the AA and RA metrics, we apply the scoring formula for each common neighbor $b$, and for the other metrics, we simply count the number of common neighbors. The scores\ignore{, or the number of common neighbors}, are accumulated in a collision-free per-thread hashtable $H_t$.
+In the \textit{scoring phase} (lines \ref{alg:predict--scoring-begin}-\ref{alg:predict--scoring-end}), each vertex is processed in parallel. For each vertex $a$, we scan its second-order neighbors $c$, considering only neighbors of its first-order neighbors $b$, which have a degree $|\Gamma_b|$ less than or equal to the hub limit $L_H$\ignore{ --- this is based on the idea that large hubs (here, the first order neighbors) confer little similarity among its neighbors (here, between the current vertex $i$, and its second order neighbors)}. The scoring of potential edges is done in the \texttt{scanEdges} function (lines \ref{alg:predict--scan-begin}-\ref{alg:predict--scan-end}). Here, we skip the reverse edges (where $c \leq a$), and calculate a score for each potential second-order neighbor $c$ based on the given metric, i.e., for the AA and RA metrics, we apply the scoring formula for each common neighbor $b$, and for the other metrics, we simply count the number of common neighbors. The scores\ignore{, or the number of common neighbors} are accumulated in a collision-free per-thread hashtable $H_t$.
 
 After scanning, we set entries corresponding to first-order neighbors of $a$ to $0$ in $H_t$ to avoid considering them as potential edges (line \ref{alg:predict--avoid-neighbors1}). We then calculate a score for each potential edge $(a, c)$ from the hashtable $H_t$, and if the score exceeds the specified threshold $S_{th}$, the edge is added to a per-thread prediction list $P_t$. The list is maintained as a min-heap based on scores (after $N_P$ edges have been added), in order to efficiently keep track of top $N_P$ edges. The size of $P_t$ is controlled to retain only the top-scoring edges. After scoring all the vertices in parallel, the merging phase begins.
 
